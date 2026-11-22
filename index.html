@@ -116,7 +116,7 @@
   function trackScale(y){let t=clamp((y-H*.19)/(H*.85),0,1);return .22+.78*Math.pow(t,1.04)}
   function laneX(lane,y){return W/2+((lane+.5)/3-.5)*Math.min(W*.74,470)*trackScale(y)}
   function playerY(){return H*.765}
-  function setMode(mode){state.mode=mode;app.dataset.mode=mode;$('start-screen').classList.toggle('hidden',mode!=='menu');$('pause-screen').classList.toggle('hidden',mode!=='paused');$('end-screen').classList.toggle('hidden',mode!=='over');$('pause').disabled=mode!=='playing';$('pause').style.opacity=mode==='playing'?'1':'.4'}
+  function setMode(mode){state.mode=mode;app.dataset.mode=mode;$('start-screen').classList.toggle('hidden',mode!=='menu');$('pause-screen').classList.toggle('hidden',mode!=='paused');$('end-screen').classList.toggle('hidden',mode!=='over');$('pause').disabled=mode!=='playing';$('pause').style.opacity=mode==='playing'?'1':'.4';if(mode==='playing')startEngine();else stopEngine()}
   function resize(){const oldW=W; W=window.innerWidth;H=window.innerHeight;DPR=Math.min(window.devicePixelRatio||1,2);canvas.width=Math.floor(W*DPR);canvas.height=Math.floor(H*DPR);canvas.style.width=W+'px';canvas.style.height=H+'px';ctx.setTransform(DPR,0,0,DPR,0,0);if(!state.stars.length||Math.abs(oldW-W)>90)state.stars=Array.from({length:Math.min(100,Math.floor(W*H/5200))},()=>({x:Math.random(),y:Math.random()*.85,r:rand(.4,1.8),v:rand(.2,.9),alpha:rand(.16,.55)}));state.playerX=laneX(state.lane,playerY())}
   function audioTone(freq,duration=.1,type='sine',vol=.045,endFreq){if(!state.sound)return;try{audio=audio||new(window.AudioContext||window.webkitAudioContext)();if(audio.state==='suspended')audio.resume();const t=audio.currentTime,o=audio.createOscillator(),g=audio.createGain();o.type=type;o.frequency.setValueAtTime(freq,t);if(endFreq)o.frequency.exponentialRampToValueAtTime(Math.max(1,endFreq),t+duration);g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.0001,t+duration);o.connect(g);g.connect(audio.destination);o.start(t);o.stop(t+duration+.008)}catch{}}
   function audioExplosion(){
@@ -135,6 +135,30 @@
       src.buffer=buffer;src.connect(filter);filter.connect(gain);gain.connect(audio.destination);
       src.start();src.stop(audio.currentTime+.40);
     }catch{}
+  }
+  let engineOsc=null,engineGain=null;
+  function startEngine(){
+    if(!state.sound || state.mode!=='playing' || engineOsc)return;
+    try{
+      audio=audio||new(window.AudioContext||window.webkitAudioContext)();
+      if(audio.state==='suspended')audio.resume();
+      const oscillator=audio.createOscillator(),filter=audio.createBiquadFilter(),gain=audio.createGain();
+      oscillator.type='sawtooth';oscillator.frequency.setValueAtTime(91,audio.currentTime);
+      filter.type='lowpass';filter.frequency.value=220;gain.gain.setValueAtTime(0,audio.currentTime);
+      gain.gain.setTargetAtTime(.007,audio.currentTime,.12);
+      oscillator.connect(filter);filter.connect(gain);gain.connect(audio.destination);
+      oscillator.start();engineOsc=oscillator;engineGain=gain;
+    }catch{}
+  }
+  function stopEngine(){
+    if(!engineOsc)return;
+    try{
+      const at=audio.currentTime;
+      engineGain.gain.cancelScheduledValues(at);
+      engineGain.gain.setTargetAtTime(.00001,at,.04);
+      engineOsc.stop(at+.22);
+    }catch{}
+    engineOsc=null;engineGain=null;
   }
   function haptic(ms=13){if(navigator.vibrate)try{navigator.vibrate(ms)}catch{}}
   function toast(msg,color='#5dfcf1'){const el=$('toast');el.textContent=msg;el.style.color=color;el.classList.add('show');state.toastTime=.95}
@@ -397,7 +421,7 @@
   function draw(){ctx.save();if(state.rumble>.03)ctx.translate(rand(-8,8)*state.rumble,rand(-8,8)*state.rumble);background();for(const ob of state.obstacles){drawObstacle(ob)}if(state.mode!=='menu')drawPlayer();drawParticles();if(state.flash>.01){ctx.fillStyle=`rgba(105,239,255,${state.flash*.08})`;ctx.fillRect(0,0,W,H)}ctx.restore()}
   function loop(ms){const t=ms*.001;const dt=Math.min(.04,Math.max(0,t-last));last=t;update(dt);draw();raf=requestAnimationFrame(loop)}
   $('start').addEventListener('click',start);$('restart').addEventListener('click',start);$('resume').addEventListener('click',()=>setMode('playing'));$('quit').addEventListener('click',()=>{reset();setMode('menu')});$('pause').addEventListener('click',()=>{if(state.mode==='playing')setMode('paused')});$('left').addEventListener('click',()=>move(-1));$('right').addEventListener('click',()=>move(1));phaseBtn.addEventListener('click',phase);
-  $('sound').addEventListener('click',()=>{state.sound=!state.sound;safeWrite(STORAGE_SOUND,state.sound?'on':'off');$('sound').setAttribute('aria-label',state.sound?'Mute sound':'Unmute sound');$('sound-icon').setAttribute('d',state.sound?'M11 5 6 9H3v6h3l5 4V5Zm4 4a5 5 0 0 1 0 6m3-9a9 9 0 0 1 0 12':'M11 5 6 9H3v6h3l5 4V5Zm5 4 5 6m0-6-5 6');if(state.sound)audioTone(720,.12)});
+  $('sound').addEventListener('click',()=>{state.sound=!state.sound;safeWrite(STORAGE_SOUND,state.sound?'on':'off');$('sound').setAttribute('aria-label',state.sound?'Mute sound':'Unmute sound');$('sound-icon').setAttribute('d',state.sound?'M11 5 6 9H3v6h3l5 4V5Zm4 4a5 5 0 0 1 0 6m3-9a9 9 0 0 1 0 12':'M11 5 6 9H3v6h3l5 4V5Zm5 4 5 6m0-6-5 6');if(state.sound){audioTone(720,.12);startEngine()}else stopEngine()});
   $('share').addEventListener('click',async()=>{const url=(location.protocol==='http:'||location.protocol==='https:')?location.href:'';const data={title:'PULSE DRIFT',text:'Can you beat my score in PULSE DRIFT? ⚡',...(url?{url}:{})};try{if(navigator.share)await navigator.share(data);else if(navigator.clipboard && url){await navigator.clipboard.writeText(url);$('share').textContent='LINK COPIED ✓'}else{$('share').textContent='SHARE AFTER PUBLISHING'}}catch{}});
   let startX=null,startY=null;
   canvas.addEventListener('pointerdown',e=>{if(state.mode!=='playing')return;startX=e.clientX;startY=e.clientY;canvas.setPointerCapture&&canvas.setPointerCapture(e.pointerId)});
