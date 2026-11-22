@@ -130,11 +130,10 @@ public final class MainActivity extends Activity {
         }
         final RewardedAd ad = rewardedAd;
         rewardedAd = null;
+        final boolean[] earned = {false};
         ad.setFullScreenContentCallback(new FullScreenContentCallback() {
-            private boolean awarded = false;
-
             @Override public void onAdDismissedFullScreenContent() {
-                if (!awarded) notifyGame("onAdUnavailable");
+                if (!earned[0]) notifyGame("onAdUnavailable");
                 loadRewardedAd();
             }
             @Override public void onAdFailedToShowFullScreenContent(AdError error) {
@@ -142,11 +141,14 @@ public final class MainActivity extends Activity {
                 loadRewardedAd();
             }
 
-            // Called only after AdMob confirms that the reward criteria were met.
-            void recordReward() { awarded = true; }
         });
         // The game receives +1 life ONLY from the SDK reward callback.
-        ad.show(this, rewardItem -> notifyGame("onReward"));
+        ad.show(this, rewardItem -> {
+            if (!earned[0]) {
+                earned[0] = true;
+                notifyGame("onReward");
+            }
+        });
     }
 
     private void notifyGame(String event) {
