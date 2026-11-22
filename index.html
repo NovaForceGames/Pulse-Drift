@@ -11,7 +11,7 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" type="image/svg+xml" href="icon.svg">
   
-  <title>PULSE DRIFT | NovaForce Games — WARZONE V10</title>
+  <title>NovaForce Games | PULSE DRIFT — WARZONE V11</title>
   <style>
     :root { color-scheme:dark; --aqua:#5dfcf1; --pink:#f05dff; --yellow:#ffdf88; --ink:#070b19; --muted:#94a6c9; --line:rgba(143,217,255,.16); }
     *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -48,6 +48,11 @@
     .panel{position:relative;width:min(438px,100%);padding:clamp(25px,5vw,36px);border-radius:28px;border:1px solid rgba(130,194,242,.22);background:linear-gradient(143deg,rgba(20,34,68,.91),rgba(10,13,38,.96) 60%,rgba(23,15,48,.95));box-shadow:0 28px 90px rgba(0,0,0,.56),inset 0 1px 0 rgba(255,255,255,.09);text-align:center;overflow:hidden}
     .panel::before{content:"";position:absolute;inset:0 0 auto;height:3px;background:linear-gradient(90deg,transparent,var(--aqua),var(--pink),transparent)}
     .novaforce-kicker{display:flex;flex-direction:column;gap:6px;align-items:center}
+    .in-game-studio{position:absolute;z-index:4;top:calc(77px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);max-width:90vw;white-space:nowrap;color:#a7fff7;text-align:center;font-size:clamp(15px,4.2vw,19px);font-weight:950;letter-spacing:.015em;text-transform:none!important;text-shadow:0 0 14px rgba(92,250,242,.7);pointer-events:none}
+    .in-game-studio strong,.end-studio strong{font-size:1.1em;color:#fff;text-transform:uppercase!important}
+    #app:not([data-mode="playing"]) .in-game-studio{display:none}
+    .health-strip{top:calc(116px + env(safe-area-inset-top))}
+    .end-studio{font-size:20px;font-weight:950;color:#a7fff7;text-transform:none!important;letter-spacing:.01em;margin:0 auto 12px;text-shadow:0 0 16px rgba(92,250,242,.6)}
     .novaforce-wordmark{display:flex;align-items:center;justify-content:center;gap:7px;font-weight:950;color:#9afdf4;letter-spacing:.015em;font-size:clamp(19px,5.1vw,25px);text-transform:none!important;font-variant:normal!important;text-shadow:0 0 15px #4ceded7c}
     .nf-name{text-transform:none!important;white-space:nowrap;font-variant:normal!important;letter-spacing:.005em}
     .nf-caps{display:inline-block;color:#ffffff;font-weight:1000;font-size:1.14em;text-transform:uppercase!important;text-shadow:0 0 15px #48fffd}
@@ -82,6 +87,9 @@
     @media(max-width:380px){.hud{left:10px;right:10px}.stat{padding:9px 10px;min-width:79px}.stat b{font-size:22px}.stat.best b{font-size:17px}.icon-btn{width:38px;height:38px}.move-btn{height:62px}.phase-btn{height:69px;flex-basis:100px}.controls{gap:9px;bottom:calc(12px + env(safe-area-inset-bottom))}.panel{padding:24px}.overline{top:calc(86px + env(safe-area-inset-top))}}
     @media(max-height:680px){.panel{padding:21px}.mini-visual{height:46px;margin:0 0 10px}.mini-visual .lane{height:41px}.kicker{margin-bottom:10px}h1{font-size:45px;margin:6px 0 14px}.lead{font-size:12px;margin-bottom:14px}.chips{margin-bottom:14px}.overlay{padding-top:10px;padding-bottom:10px}.muted{margin-top:10px}.controls{bottom:calc(8px + env(safe-area-inset-bottom))}.lower-hint{display:none}}
     @media(prefers-reduced-motion:reduce){.phase-btn.ready{animation:none}*{scroll-behavior:auto!important}}
+    /* Brand and lives remain readable across small iPhone screens. */
+    #app .health-strip{top:calc(115px + env(safe-area-inset-top))}
+    #app .special-warning{top:calc(158px + env(safe-area-inset-top))}
   </style>
 </head>
 <body>
@@ -94,6 +102,7 @@
       <button id="pause" class="icon-btn" aria-label="Pause game" title="Pause"><svg viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></svg></button>
     </div>
   </header>
+  <div class="in-game-studio" aria-label="NovaForce Games">✦ <strong>N</strong>ova<strong>F</strong>orce <strong>G</strong>ames</div>
   <div class="overline health-strip" id="health" role="status" aria-live="polite">♥ ♥ ♥ ♥ ♥ · 5 LIVES</div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div><div class="special-warning" id="incoming">⚠ DANGER</div>
   <div class="lower-hint">AUTO FIRE ON · SWIPE TO AIM · PHASE TO SURVIVE</div>
@@ -103,10 +112,10 @@
     <button id="right" class="move-btn" aria-label="Move right"><svg viewBox="0 0 24 24"><path d="m9.5 5 7 7-7 7"/></svg></button>
   </nav>
   <section id="start-screen" class="overlay" aria-label="Start screen">
-    <div class="panel"><div class="kicker novaforce-kicker"><span class="novaforce-wordmark" aria-label="NovaForce Games"><span class="nf-symbol">✦</span> <span class="nf-name"><span class="nf-caps">N</span>ova<span class="nf-caps">F</span>orce <span class="nf-caps">G</span>ames</span></span><span class="novaforce-subline">PRESENTS · WARZONE V10</span></div><div class="mini-visual" aria-hidden="true"><div class="lane"></div><div class="lane"></div><div class="lane"></div></div><h1>PULSE<span>DRIFT</span></h1><p class="lead">AUTO FIRE won't stop shielded drones or mines! Survive dense missile waves, dodge armored bombs that take 8–9 hits, and earn bonus lives.</p><div class="chips"><span class="chip">♥ 5 LIVES</span><span class="chip">🔫 AUTO FIRE</span><span class="chip">🛡 DODGE DRONES & MINES</span><span class="chip">↔ SWIPE TO AIM</span><span class="chip">✦ GRAB ENERGY</span><span class="chip">⚡ PHASE TO SURVIVE</span></div><button id="start" class="primary">START RUN ↗</button><div class="muted">A NovaForce Games title · Free to play · No account needed</div></div>
+    <div class="panel"><div class="kicker novaforce-kicker"><span class="novaforce-wordmark" aria-label="NovaForce Games"><span class="nf-symbol">✦</span> <span class="nf-name"><span class="nf-caps">N</span>ova<span class="nf-caps">F</span>orce <span class="nf-caps">G</span>ames</span></span><span class="novaforce-subline">PRESENTS · WARZONE V11</span></div><div class="mini-visual" aria-hidden="true"><div class="lane"></div><div class="lane"></div><div class="lane"></div></div><h1>PULSE<span>DRIFT</span></h1><p class="lead">AUTO FIRE won't stop shielded drones or mines! Survive dense missile waves, dodge armored bombs that take 8–9 hits, and earn bonus lives.</p><div class="chips"><span class="chip">♥ 5 LIVES</span><span class="chip">🔫 AUTO FIRE</span><span class="chip">🛡 DODGE DRONES & MINES</span><span class="chip">↔ SWIPE TO AIM</span><span class="chip">✦ GRAB ENERGY</span><span class="chip">⚡ PHASE TO SURVIVE</span></div><button id="start" class="primary">START RUN ↗</button><div class="muted">A NovaForce Games title · Free to play · No account needed</div></div>
   </section>
   <section id="pause-screen" class="overlay hidden" aria-label="Pause screen"><div class="panel"><div class="kicker">STAY IN CONTROL</div><h2>PAUSED</h2><p class="lead">Your run is safe. Continue whenever you are ready.</p><div class="buttons"><button id="resume" class="primary">RESUME RUN ↗</button><button id="quit" class="secondary">BACK TO MENU</button></div></div></section>
-  <section id="end-screen" class="overlay hidden" aria-label="Game over screen"><div class="panel"><div class="kicker" id="end-kicker">SIGNAL LOST</div><h2>RUN COMPLETE</h2><p class="lead" id="end-message">Every run makes you faster. Go for a new best!</p><div class="result"><div class="cell"><small>YOUR SCORE</small><strong id="final-score">0</strong></div><div class="cell"><small>PERSONAL BEST</small><strong id="final-best">0</strong></div></div><div class="buttons"><button id="restart" class="primary">TRY AGAIN ↗</button><button id="share" class="secondary">SHARE THE GAME ↗</button></div></div></section>
+  <section id="end-screen" class="overlay hidden" aria-label="Game over screen"><div class="panel"><div class="end-studio">✦ <strong>N</strong>ova<strong>F</strong>orce <strong>G</strong>ames</div><div class="kicker" id="end-kicker">SIGNAL LOST</div><h2>RUN COMPLETE</h2><p class="lead" id="end-message">Every run makes you faster. Go for a new best!</p><div class="result"><div class="cell"><small>YOUR SCORE</small><strong id="final-score">0</strong></div><div class="cell"><small>PERSONAL BEST</small><strong id="final-best">0</strong></div></div><div class="buttons"><button id="restart" class="primary">TRY AGAIN ↗</button><button id="share" class="secondary">SHARE THE GAME ↗</button></div></div></section>
 </main>
 <script>
 (() => {
