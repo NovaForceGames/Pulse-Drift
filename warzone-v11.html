@@ -11,7 +11,7 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" type="image/svg+xml" href="icon.svg">
   
-  <title>NovaForce Games | PULSE DRIFT — WARZONE V11</title>
+  <title>NovaForce Games | PULSE DRIFT — WARZONE V12 · REWARD CONTINUE</title>
   <style>
     :root { color-scheme:dark; --aqua:#5dfcf1; --pink:#f05dff; --yellow:#ffdf88; --ink:#070b19; --muted:#94a6c9; --line:rgba(143,217,255,.16); }
     *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -76,6 +76,12 @@
     .result .cell{padding:16px 9px;border:1px solid rgba(127,204,232,.2);border-radius:15px;background:#0d1c36a0}
     .result small{display:block;font-size:10px;letter-spacing:.17em;color:#a0bad4;font-weight:850}.result strong{display:block;font-size:31px;letter-spacing:-.05em;margin-top:4px;font-variant-numeric:tabular-nums}
     .buttons{display:grid;gap:10px}
+    .continue-button{background:linear-gradient(115deg,#38ffca,#b0ffdd);color:#071b24;border:0;border-radius:14px;padding:13px 9px;min-height:55px;font-size:13px;letter-spacing:.04em;font-weight:1000;box-shadow:0 0 18px #33ffaf42}
+    .continue-button[hidden]{display:none!important}
+    .continue-note{color:#b9c9e7;font-size:10px;line-height:1.45;margin:-4px 0 2px}
+    .continue-note[hidden]{display:none!important}
+    .privacy-links{font-size:11px;color:#a8b9d9;margin-top:9px}
+    .privacy-links a{color:#9ffdf1;text-decoration:underline;text-underline-offset:3px}
     .toast{z-index:4;position:absolute;left:50%;top:30%;transform:translateX(-50%) translateY(8px);pointer-events:none;opacity:0;transition:opacity .17s,transform .17s;text-shadow:0 0 22px #5dfcf1a0;font-size:17px;white-space:nowrap;font-weight:1000;letter-spacing:.09em;color:var(--aqua)}
     .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
     .special-warning{position:absolute;z-index:5;top:calc(127px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);max-width:95vw;white-space:nowrap;padding:9px 13px;border-radius:11px;background:#631c32ec;border:1px solid #ff9673;color:#fff2bd;font-size:11px;font-weight:950;letter-spacing:.09em;box-shadow:0 0 23px #ff546d8a;opacity:0;pointer-events:none}
@@ -112,10 +118,10 @@
     <button id="right" class="move-btn" aria-label="Move right"><svg viewBox="0 0 24 24"><path d="m9.5 5 7 7-7 7"/></svg></button>
   </nav>
   <section id="start-screen" class="overlay" aria-label="Start screen">
-    <div class="panel"><div class="kicker novaforce-kicker"><span class="novaforce-wordmark" aria-label="NovaForce Games"><span class="nf-symbol">✦</span> <span class="nf-name"><span class="nf-caps">N</span>ova<span class="nf-caps">F</span>orce <span class="nf-caps">G</span>ames</span></span><span class="novaforce-subline">PRESENTS · WARZONE V11</span></div><div class="mini-visual" aria-hidden="true"><div class="lane"></div><div class="lane"></div><div class="lane"></div></div><h1>PULSE<span>DRIFT</span></h1><p class="lead">AUTO FIRE won't stop shielded drones or mines! Survive dense missile waves, dodge armored bombs that take 8–9 hits, and earn bonus lives.</p><div class="chips"><span class="chip">♥ 5 LIVES</span><span class="chip">🔫 AUTO FIRE</span><span class="chip">🛡 DODGE DRONES & MINES</span><span class="chip">↔ SWIPE TO AIM</span><span class="chip">✦ GRAB ENERGY</span><span class="chip">⚡ PHASE TO SURVIVE</span></div><button id="start" class="primary">START RUN ↗</button><div class="muted">A NovaForce Games title · Free to play · No account needed</div></div>
+    <div class="panel"><div class="kicker novaforce-kicker"><span class="novaforce-wordmark" aria-label="NovaForce Games"><span class="nf-symbol">✦</span> <span class="nf-name"><span class="nf-caps">N</span>ova<span class="nf-caps">F</span>orce <span class="nf-caps">G</span>ames</span></span><span class="novaforce-subline">PRESENTS · WARZONE V12</span></div><div class="mini-visual" aria-hidden="true"><div class="lane"></div><div class="lane"></div><div class="lane"></div></div><h1>PULSE<span>DRIFT</span></h1><p class="lead">AUTO FIRE won't stop shielded drones or mines! Survive dense missile waves, dodge armored bombs that take 8–9 hits, and earn bonus lives.</p><div class="chips"><span class="chip">♥ 5 LIVES</span><span class="chip">🔫 AUTO FIRE</span><span class="chip">🛡 DODGE DRONES & MINES</span><span class="chip">↔ SWIPE TO AIM</span><span class="chip">✦ GRAB ENERGY</span><span class="chip">⚡ PHASE TO SURVIVE</span></div><button id="start" class="primary">START RUN ↗</button><div class="muted">A NovaForce Games title · Free to play · No account needed</div><div class="privacy-links"><a href="privacy.html" target="_blank" rel="noopener">Privacy / Gizlilik</a></div></div>
   </section>
   <section id="pause-screen" class="overlay hidden" aria-label="Pause screen"><div class="panel"><div class="kicker">STAY IN CONTROL</div><h2>PAUSED</h2><p class="lead">Your run is safe. Continue whenever you are ready.</p><div class="buttons"><button id="resume" class="primary">RESUME RUN ↗</button><button id="quit" class="secondary">BACK TO MENU</button></div></div></section>
-  <section id="end-screen" class="overlay hidden" aria-label="Game over screen"><div class="panel"><div class="end-studio">✦ <strong>N</strong>ova<strong>F</strong>orce <strong>G</strong>ames</div><div class="kicker" id="end-kicker">SIGNAL LOST</div><h2>RUN COMPLETE</h2><p class="lead" id="end-message">Every run makes you faster. Go for a new best!</p><div class="result"><div class="cell"><small>YOUR SCORE</small><strong id="final-score">0</strong></div><div class="cell"><small>PERSONAL BEST</small><strong id="final-best">0</strong></div></div><div class="buttons"><button id="restart" class="primary">TRY AGAIN ↗</button><button id="share" class="secondary">SHARE THE GAME ↗</button></div></div></section>
+  <section id="end-screen" class="overlay hidden" aria-label="Game over screen"><div class="panel"><div class="end-studio">✦ <strong>N</strong>ova<strong>F</strong>orce <strong>G</strong>ames</div><div class="kicker" id="end-kicker">SIGNAL LOST</div><h2>RUN COMPLETE</h2><p class="lead" id="end-message">Every run makes you faster. Go for a new best!</p><div class="result"><div class="cell"><small>YOUR SCORE</small><strong id="final-score">0</strong></div><div class="cell"><small>PERSONAL BEST</small><strong id="final-best">0</strong></div></div><div class="buttons"><button id="continue" class="continue-button" hidden>CONTINUE · +1 LIFE</button><div id="continue-note" class="continue-note" hidden>Web test: free continue, no advert shown.</div><button id="restart" class="primary">TRY AGAIN ↗</button><button id="share" class="secondary">SHARE THE GAME ↗</button></div></div></section>
 </main>
 <script>
 (() => {
@@ -127,7 +133,7 @@
   const STORAGE_BEST='pulse-drift-best-v1',STORAGE_SOUND='pulse-drift-sound-v1';
   const safeRead=(key,fallback)=>{try{return localStorage.getItem(key)??fallback}catch{return fallback}};
   const safeWrite=(key,val)=>{try{localStorage.setItem(key,String(val))}catch{}};
-  const state={mode:'menu', score:0,best:Math.max(0,Number(safeRead(STORAGE_BEST,0))||0),elapsed:0,lane:1,playerX:0,charge:0,phaseTime:0,combo:0,spawnTime:.65,lives:5,maxLives:8,hitShield:0,nextLifeScore:1200,specialTimer:5.5,alertTime:0,waveIndex:0,fireTimer:0,shots:[],blastRings:[],destroyedRockets:0,muzzleFlash:0,obstacles:[],particles:[],stars:[],rumble:0,sound:safeRead(STORAGE_SOUND,'on')==='on',toastTime:0,frameTime:0,flash:0,runId:0};
+  const state={mode:'menu', score:0,best:Math.max(0,Number(safeRead(STORAGE_BEST,0))||0),elapsed:0,lane:1,playerX:0,charge:0,phaseTime:0,combo:0,spawnTime:.65,lives:5,maxLives:8,hitShield:0,nextLifeScore:1200,specialTimer:5.5,alertTime:0,waveIndex:0,fireTimer:0,shots:[],blastRings:[],destroyedRockets:0,muzzleFlash:0,obstacles:[],particles:[],stars:[],rumble:0,sound:safeRead(STORAGE_SOUND,'on')==='on',toastTime:0,frameTime:0,flash:0,runId:0,continuesUsed:0,rewardPending:false};
   let W=0,H=0,DPR=1,last=0,raf=0, audio=null;
   const clamp=(x,min,max)=>Math.max(min,Math.min(max,x));
   const fmt=n=>Math.max(0,Math.floor(n)).toLocaleString('en-US');
@@ -273,7 +279,7 @@
   function haptic(ms=13){if(navigator.vibrate)try{navigator.vibrate(ms)}catch{}}
   function toast(msg,color='#5dfcf1'){const el=$('toast');el.textContent=msg;el.style.color=color;el.classList.add('show');state.toastTime=.95}
   function updateHud(){healthEl.textContent='♥ '.repeat(state.lives).trim()+'  ·  '+state.lives+' LIVES';scoreEl.textContent=String(Math.floor(state.score)).padStart(5,'0');bestEl.textContent=String(Math.floor(state.best)).padStart(5,'0');const charge=Math.floor(state.charge);phaseBtn.style.setProperty('--meter',charge+'%');phaseBtn.style.setProperty('--charge',charge/100);phaseBtn.classList.toggle('ready',charge>=100 && state.phaseTime<=0);phaseLabel.textContent=state.phaseTime>0?'PHASE ACTIVE':charge>=100?'READY · TAP':charge+'% CHARGE'}
-  function reset(){state.runId++;state.score=0;state.elapsed=0;state.lives=5;state.hitShield=0;state.nextLifeScore=1200;state.lane=1;state.playerX=laneX(1,playerY());state.charge=0;state.phaseTime=0;state.combo=0;state.spawnTime=.85;state.specialTimer=5.5;state.waveIndex=0;state.alertTime=0;$('incoming').classList.remove('active');state.fireTimer=.08;state.shots=[];state.blastRings=[];state.destroyedRockets=0;state.muzzleFlash=0;state.warningCooldown=0;state.battleSoundTimer=1.25;state.obstacles=[];state.particles=[];state.rumble=0;state.flash=0;state.toastTime=0;$('toast').classList.remove('show');updateHud()}
+  function reset(){state.runId++;state.continuesUsed=0;state.rewardPending=false;state.score=0;state.elapsed=0;state.lives=5;state.hitShield=0;state.nextLifeScore=1200;state.lane=1;state.playerX=laneX(1,playerY());state.charge=0;state.phaseTime=0;state.combo=0;state.spawnTime=.85;state.specialTimer=5.5;state.waveIndex=0;state.alertTime=0;$('incoming').classList.remove('active');state.fireTimer=.08;state.shots=[];state.blastRings=[];state.destroyedRockets=0;state.muzzleFlash=0;state.warningCooldown=0;state.battleSoundTimer=1.25;state.obstacles=[];state.particles=[];state.rumble=0;state.flash=0;state.toastTime=0;$('toast').classList.remove('show');updateHud()}
   function loseLife(){
     if(state.mode!=='playing'||state.hitShield>0||state.phaseTime>0)return;
     state.lives=Math.max(0,state.lives-1);
@@ -301,7 +307,28 @@
     }
   }
   function start(){reset();audioReady();setMode('playing');audioTone(205,.4,'sawtooth',.065,640);setTimeout(()=>{if(state.mode==='playing')audioTone(850,.19,'sine',.045,1100)},135)}
-  function end(){if(state.mode!=='playing')return;state.rumble=.5;state.flash=.6;burst(state.playerX,playerY(),'#f05dff',36,260);soundExplosion(1.0);haptic([40,35,80]);const score=Math.floor(state.score);let isBest=score>state.best;if(isBest){state.best=score;safeWrite(STORAGE_BEST,state.best)}$('final-score').textContent=fmt(score);$('final-best').textContent=fmt(state.best);$('end-kicker').textContent=isBest?'✦ NEW PERSONAL BEST':'SIGNAL LOST';$('end-message').textContent=isBest?'Incredible run. You set a new personal best!':'Every run makes you sharper. One more try?';updateHud();setMode('over')}
+  function end(){if(state.mode!=='playing')return;state.rumble=.5;state.flash=.6;burst(state.playerX,playerY(),'#f05dff',36,260);soundExplosion(1.0);haptic([40,35,80]);const score=Math.floor(state.score);let isBest=score>state.best;if(isBest){state.best=score;safeWrite(STORAGE_BEST,state.best)}$('final-score').textContent=fmt(score);$('final-best').textContent=fmt(state.best);$('end-kicker').textContent=isBest?'✦ NEW PERSONAL BEST':'SIGNAL LOST';$('end-message').textContent=isBest?'Incredible run. You set a new personal best!':'Every run makes you sharper. One more try?';updateHud();setMode('over');$('continue').hidden=state.continuesUsed>0;$('continue-note').hidden=state.continuesUsed>0;$('continue').disabled=false;$('continue').textContent=window.NovaForceAndroidAds?'WATCH REWARDED AD · +1 LIFE':'FREE TEST CONTINUE · +1 LIFE';$('continue-note').textContent=window.NovaForceAndroidAds?'Reward only after completing an ad. Uses Google test ads during development.':'Web test only: no advert is shown or revenue earned.'}
+  function applyRewardedContinue(){
+    if(state.mode!=='over'||state.continuesUsed!==0||!state.rewardPending)return;
+    state.rewardPending=false;state.continuesUsed=1;state.lives=1;state.hitShield=3;state.obstacles=[];state.shots=[];state.flash=.05;state.phaseTime=0;state.spawnTime=1.1;
+    updateHud();setMode('playing');toast('+1 LIFE · SECOND CHANCE','#9fffe4');
+  }
+  // The Android bridge calls onReward ONLY after Google confirms a reward.
+  // Browsers intentionally use a clearly labelled free gameplay test.
+  window.NovaForceGame={
+    onReward:()=>applyRewardedContinue(),
+    onAdUnavailable:()=>{state.rewardPending=false;if(state.mode==='over'){$('continue').disabled=false;$('continue').textContent='RETRY REWARDED AD · +1 LIFE';$('continue-note').textContent='No test ad available. You can still restart for free.';}}
+  };
+  function requestContinue(){
+    if(state.mode!=='over'||state.continuesUsed!==0||state.rewardPending)return;
+    state.rewardPending=true;
+    if(window.NovaForceAndroidAds&&typeof window.NovaForceAndroidAds.showRewardedAd==='function'){
+      $('continue').disabled=true;$('continue').textContent='LOADING REWARDED AD…';
+      try{window.NovaForceAndroidAds.showRewardedAd()}catch(e){window.NovaForceGame.onAdUnavailable();}
+    }else{
+      applyRewardedContinue();
+    }
+  }
   function move(dx){if(state.mode!=='playing')return;const next=clamp(state.lane+dx,0,2);if(next!==state.lane){state.lane=next;audioTone(450,.09,'triangle',.025,280);haptic(8);burst(laneX(next,playerY()),playerY()+12,'#5dfcf1',4,70)}}
   function phase(){if(state.mode!=='playing'||state.charge<100||state.phaseTime>0)return;state.charge=0;state.phaseTime=1.6;state.flash=.2;soundPhase();haptic([15,30,15]);toast('PHASE ENGAGED');burst(state.playerX,playerY(),'#5dfcf1',32,210);updateHud()}
   function burst(x,y,color,num=12,power=100){if(prefersReduced)num=Math.min(num,8);for(let i=0;i<num;i++){let a=Math.random()*Math.PI*2,s=rand(power*.25,power),life=rand(.27,.75);state.particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,r:rand(1.5,4),life,max:life,color})}if(state.particles.length>160)state.particles.splice(0,state.particles.length-160)}
@@ -746,7 +773,7 @@ if(!ob.hit&&prev<py && ob.y>=py){ob.hit=true;if(ob.lane===state.lane){if(ob.kind
   function drawParticles(){ctx.save();for(const p of state.particles){ctx.globalAlpha=clamp(p.life/p.max,0,1);ctx.fillStyle=p.color;ctx.shadowColor=p.color;ctx.shadowBlur=8;ctx.beginPath();ctx.arc(p.x,p.y,p.r*clamp(p.life/p.max,.1,1),0,Math.PI*2);ctx.fill()}ctx.restore()}
   function draw(){ctx.save();if(state.rumble>.03)ctx.translate(rand(-8,8)*state.rumble,rand(-8,8)*state.rumble);background();for(const ob of state.obstacles){if(!ob.destroyed)drawObstacle(ob)}drawShots();if(state.mode!=='menu')drawPlayer();drawBlastRings();drawParticles();if(state.flash>.01){ctx.fillStyle=`rgba(105,239,255,${state.flash*.08})`;ctx.fillRect(0,0,W,H)}ctx.restore()}
   function loop(ms){const t=ms*.001;const dt=Math.min(.04,Math.max(0,t-last));last=t;update(dt);draw();raf=requestAnimationFrame(loop)}
-  $('start').addEventListener('click',start);$('restart').addEventListener('click',start);$('resume').addEventListener('click',()=>setMode('playing'));$('quit').addEventListener('click',()=>{reset();setMode('menu')});$('pause').addEventListener('click',()=>{if(state.mode==='playing')setMode('paused')});$('left').addEventListener('click',()=>move(-1));$('right').addEventListener('click',()=>move(1));phaseBtn.addEventListener('click',phase);
+  $('start').addEventListener('click',start);$('restart').addEventListener('click',start);$('continue').addEventListener('click',requestContinue);$('resume').addEventListener('click',()=>setMode('playing'));$('quit').addEventListener('click',()=>{reset();setMode('menu')});$('pause').addEventListener('click',()=>{if(state.mode==='playing')setMode('paused')});$('left').addEventListener('click',()=>move(-1));$('right').addEventListener('click',()=>move(1));phaseBtn.addEventListener('click',phase);
   $('sound').addEventListener('click',()=>{state.sound=!state.sound;safeWrite(STORAGE_SOUND,state.sound?'on':'off');$('sound').setAttribute('aria-label',state.sound?'Mute sound':'Unmute sound');$('sound-icon').setAttribute('d',state.sound?'M11 5 6 9H3v6h3l5 4V5Zm4 4a5 5 0 0 1 0 6m3-9a9 9 0 0 1 0 12':'M11 5 6 9H3v6h3l5 4V5Zm5 4 5 6m0-6-5 6');if(state.sound){audioReady();audioTone(790,.16,'sine',.05,1100);startEngine();toast('SOUND ON')}else{stopEngine();toast('SOUND OFF')}});
   $('share').addEventListener('click',async()=>{const url=(location.protocol==='http:'||location.protocol==='https:')?location.href:'';const data={title:'PULSE DRIFT by NovaForce Games',text:'Can you beat my score in NovaForce Games: PULSE DRIFT? ⚡',...(url?{url}:{})};try{if(navigator.share)await navigator.share(data);else if(navigator.clipboard && url){await navigator.clipboard.writeText(url);$('share').textContent='LINK COPIED ✓'}else{$('share').textContent='SHARE AFTER PUBLISHING'}}catch{}});
   let startX=null,startY=null;
