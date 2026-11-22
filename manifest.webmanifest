@@ -1,8 +1,8 @@
 {
   "id": "./",
-  "name": "PULSE DRIFT — Neon Arcade",
+  "name": "PULSE DRIFT — Jet Warzone",
   "short_name": "PULSE DRIFT",
-  "description": "A neon arcade runner: dodge obstacles, collect energy, use PHASE.",
+  "description": "Fly a futuristic jet through a battlefield. Dodge incoming missiles and engage PHASE.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
