@@ -11,7 +11,7 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" type="image/svg+xml" href="icon.svg">
   
-  <title>PULSE DRIFT — WARZONE V5</title>
+  <title>PULSE DRIFT — WARZONE V6 · AUTO FIRE</title>
   <style>
     :root { color-scheme:dark; --aqua:#5dfcf1; --pink:#f05dff; --yellow:#ffdf88; --ink:#070b19; --muted:#94a6c9; --line:rgba(143,217,255,.16); }
     *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -85,14 +85,14 @@
   </header>
   <div class="overline">FRONTLINE · MISSILE ALERT</div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <div class="lower-hint">SWIPE TO FLY · ROCKET ALERTS · SOUND ON</div>
+  <div class="lower-hint">AUTO FIRE ON · SWIPE TO AIM · PHASE TO SURVIVE</div>
   <nav class="controls" aria-label="Game controls">
     <button id="left" class="move-btn" aria-label="Move left"><svg viewBox="0 0 24 24"><path d="m14.5 5-7 7 7 7"/></svg></button>
     <button id="phase" class="phase-btn" aria-label="Activate phase when charge is full"><span class="phase-title">PHASE</span><span id="phase-label" class="phase-detail">0% CHARGE</span><span class="phase-meter"></span></button>
     <button id="right" class="move-btn" aria-label="Move right"><svg viewBox="0 0 24 24"><path d="m9.5 5 7 7-7 7"/></svg></button>
   </nav>
   <section id="start-screen" class="overlay" aria-label="Start screen">
-    <div class="panel"><div class="kicker">FUTURISTIC JET COMBAT · WARZONE</div><div class="mini-visual" aria-hidden="true"><div class="lane"></div><div class="lane"></div><div class="lane"></div></div><h1>PULSE<span>DRIFT</span></h1><p class="lead">Pilot your stealth jet through a burning battlefield. Dodge incoming missiles, collect energy, and engage PHASE mode.</p><div class="chips"><span class="chip">↔ SWIPE TO MOVE</span><span class="chip">✦ GRAB ENERGY</span><span class="chip">⚡ PHASE TO SURVIVE</span></div><button id="start" class="primary">START RUN ↗</button><div class="muted">Free to play · Offline-ready · No account needed</div></div>
+    <div class="panel"><div class="kicker">FUTURISTIC JET COMBAT · WARZONE</div><div class="mini-visual" aria-hidden="true"><div class="lane"></div><div class="lane"></div><div class="lane"></div></div><h1>PULSE<span>DRIFT</span></h1><p class="lead">Your jet fires automatically! Move between lanes to aim at enemy missiles, collect energy, and survive the battlefield.</p><div class="chips"><span class="chip">🔫 AUTO FIRE</span><span class="chip">↔ SWIPE TO AIM</span><span class="chip">✦ GRAB ENERGY</span><span class="chip">⚡ PHASE TO SURVIVE</span></div><button id="start" class="primary">START RUN ↗</button><div class="muted">Free to play · Offline-ready · No account needed</div></div>
   </section>
   <section id="pause-screen" class="overlay hidden" aria-label="Pause screen"><div class="panel"><div class="kicker">STAY IN CONTROL</div><h2>PAUSED</h2><p class="lead">Your run is safe. Continue whenever you are ready.</p><div class="buttons"><button id="resume" class="primary">RESUME RUN ↗</button><button id="quit" class="secondary">BACK TO MENU</button></div></div></section>
   <section id="end-screen" class="overlay hidden" aria-label="Game over screen"><div class="panel"><div class="kicker" id="end-kicker">SIGNAL LOST</div><h2>RUN COMPLETE</h2><p class="lead" id="end-message">Every run makes you faster. Go for a new best!</p><div class="result"><div class="cell"><small>YOUR SCORE</small><strong id="final-score">0</strong></div><div class="cell"><small>PERSONAL BEST</small><strong id="final-best">0</strong></div></div><div class="buttons"><button id="restart" class="primary">TRY AGAIN ↗</button><button id="share" class="secondary">SHARE THE GAME ↗</button></div></div></section>
@@ -107,7 +107,7 @@
   const STORAGE_BEST='pulse-drift-best-v1',STORAGE_SOUND='pulse-drift-sound-v1';
   const safeRead=(key,fallback)=>{try{return localStorage.getItem(key)??fallback}catch{return fallback}};
   const safeWrite=(key,val)=>{try{localStorage.setItem(key,String(val))}catch{}};
-  const state={mode:'menu', score:0,best:Math.max(0,Number(safeRead(STORAGE_BEST,0))||0),elapsed:0,lane:1,playerX:0,charge:0,phaseTime:0,combo:0,spawnTime:.65,obstacles:[],particles:[],stars:[],rumble:0,sound:safeRead(STORAGE_SOUND,'on')==='on',toastTime:0,frameTime:0,flash:0,runId:0};
+  const state={mode:'menu', score:0,best:Math.max(0,Number(safeRead(STORAGE_BEST,0))||0),elapsed:0,lane:1,playerX:0,charge:0,phaseTime:0,combo:0,spawnTime:.65,fireTimer:0,shots:[],blastRings:[],destroyedRockets:0,muzzleFlash:0,obstacles:[],particles:[],stars:[],rumble:0,sound:safeRead(STORAGE_SOUND,'on')==='on',toastTime:0,frameTime:0,flash:0,runId:0};
   let W=0,H=0,DPR=1,last=0,raf=0, audio=null;
   const clamp=(x,min,max)=>Math.max(min,Math.min(max,x));
   const fmt=n=>Math.max(0,Math.floor(n)).toLocaleString('en-US');
@@ -253,14 +253,95 @@
   function haptic(ms=13){if(navigator.vibrate)try{navigator.vibrate(ms)}catch{}}
   function toast(msg,color='#5dfcf1'){const el=$('toast');el.textContent=msg;el.style.color=color;el.classList.add('show');state.toastTime=.95}
   function updateHud(){scoreEl.textContent=String(Math.floor(state.score)).padStart(5,'0');bestEl.textContent=String(Math.floor(state.best)).padStart(5,'0');const charge=Math.floor(state.charge);phaseBtn.style.setProperty('--meter',charge+'%');phaseBtn.style.setProperty('--charge',charge/100);phaseBtn.classList.toggle('ready',charge>=100 && state.phaseTime<=0);phaseLabel.textContent=state.phaseTime>0?'PHASE ACTIVE':charge>=100?'READY · TAP':charge+'% CHARGE'}
-  function reset(){state.runId++;state.score=0;state.elapsed=0;state.lane=1;state.playerX=laneX(1,playerY());state.charge=0;state.phaseTime=0;state.combo=0;state.spawnTime=.9;state.warningCooldown=0;state.battleSoundTimer=1.25;state.obstacles=[];state.particles=[];state.rumble=0;state.flash=0;state.toastTime=0;$('toast').classList.remove('show');updateHud()}
+  function reset(){state.runId++;state.score=0;state.elapsed=0;state.lane=1;state.playerX=laneX(1,playerY());state.charge=0;state.phaseTime=0;state.combo=0;state.spawnTime=.9;state.fireTimer=.08;state.shots=[];state.blastRings=[];state.destroyedRockets=0;state.muzzleFlash=0;state.warningCooldown=0;state.battleSoundTimer=1.25;state.obstacles=[];state.particles=[];state.rumble=0;state.flash=0;state.toastTime=0;$('toast').classList.remove('show');updateHud()}
   function start(){reset();audioReady();setMode('playing');audioTone(205,.4,'sawtooth',.065,640);setTimeout(()=>{if(state.mode==='playing')audioTone(850,.19,'sine',.045,1100)},135)}
   function end(){if(state.mode!=='playing')return;state.rumble=.5;state.flash=.6;burst(state.playerX,playerY(),'#f05dff',36,260);soundExplosion(1.0);haptic([40,35,80]);const score=Math.floor(state.score);let isBest=score>state.best;if(isBest){state.best=score;safeWrite(STORAGE_BEST,state.best)}$('final-score').textContent=fmt(score);$('final-best').textContent=fmt(state.best);$('end-kicker').textContent=isBest?'✦ NEW PERSONAL BEST':'SIGNAL LOST';$('end-message').textContent=isBest?'Incredible run. You set a new personal best!':'Every run makes you sharper. One more try?';updateHud();setMode('over')}
   function move(dx){if(state.mode!=='playing')return;const next=clamp(state.lane+dx,0,2);if(next!==state.lane){state.lane=next;audioTone(450,.09,'triangle',.025,280);haptic(8);burst(laneX(next,playerY()),playerY()+12,'#5dfcf1',4,70)}}
   function phase(){if(state.mode!=='playing'||state.charge<100||state.phaseTime>0)return;state.charge=0;state.phaseTime=1.6;state.flash=.2;soundPhase();haptic([15,30,15]);toast('PHASE ENGAGED');burst(state.playerX,playerY(),'#5dfcf1',32,210);updateHud()}
   function burst(x,y,color,num=12,power=100){if(prefersReduced)num=Math.min(num,8);for(let i=0;i<num;i++){let a=Math.random()*Math.PI*2,s=rand(power*.25,power),life=rand(.27,.75);state.particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,r:rand(1.5,4),life,max:life,color})}if(state.particles.length>160)state.particles.splice(0,state.particles.length-160)}
+  function soundCannon(){
+    // Short, gentle twin pulse avoids overpowering the jet engine on mobile.
+    audioTone(460,.055,'square',.013,270);
+  }
+  function fireAutocannon(){
+    if(state.mode!=='playing')return;
+    // Each shell retains the lane it was fired in; move the jet to aim.
+    state.shots.push({lane:state.lane,y:playerY()-22,age:0});
+    if(state.shots.length>28)state.shots.splice(0,state.shots.length-28);
+    state.muzzleFlash=.075;
+    soundCannon();
+  }
+  function shootAndResolve(dt,speed){
+    const nextShots=[];
+    for(const shell of state.shots){
+      const fromY=shell.y,toY=fromY-H*1.12*dt;
+      let hit=false;
+      for(const ob of state.obstacles){
+        if(ob.kind!=='block'||ob.destroyed||ob.lane!==shell.lane)continue;
+        const futureY=ob.y+speed*dt;
+        const collisionPadding=Math.max(9,Math.min(W*.74,470)*trackScale(ob.y)/3*.18);
+        // Swept hit test: reliable even when phones skip a frame.
+        if(fromY-ob.y>=-collisionPadding&&toY-futureY<=collisionPadding){
+          ob.destroyed=true;
+          hit=true;
+          const bx=laneX(ob.lane,ob.y),by=ob.y;
+          state.score+=100;state.destroyedRockets++;
+          burst(bx,by,'#ffb15a',23,165);
+          burst(bx,by,'#ff5b82',13,125);
+          state.blastRings.push({x:bx,y:by,life:.42,max:.42});
+          if(state.blastRings.length>18)state.blastRings.shift();
+          state.flash=Math.max(state.flash,.065);
+          soundExplosion(.38);
+          if(state.destroyedRockets%3===0)toast('+'+state.destroyedRockets*100+' · ROCKETS DOWN','#ffd28b');
+          else if(state.destroyedRockets===1)toast('DIRECT HIT! +100','#ffd28b');
+          break;
+        }
+      }
+      shell.y=toY;shell.age+=dt;
+      if(!hit&&shell.y>H*.17&&shell.age<1.5)nextShots.push(shell);
+    }
+    state.shots=nextShots;
+  }
+  function drawShots(){
+    ctx.save();
+    for(const shell of state.shots){
+      const x=laneX(shell.lane,shell.y),y=shell.y;
+      const offset=2+trackScale(y)*7;
+      for(const side of [-1,1]){
+        ctx.strokeStyle='#fff6bc';ctx.lineWidth=Math.max(1.7,trackScale(y)*3.4);
+        ctx.shadowBlur=15;ctx.shadowColor='#ffcf58';
+        ctx.beginPath();ctx.moveTo(x+side*offset,y+13);
+        ctx.lineTo(x+side*offset,y-18);ctx.stroke();
+        ctx.strokeStyle='#63fff3';ctx.lineWidth=1.1;ctx.beginPath();
+        ctx.moveTo(x+side*offset,y+5);ctx.lineTo(x+side*offset,y-16);ctx.stroke();
+      }
+    }
+    if(state.muzzleFlash>0&&state.mode==='playing'){
+      const x=state.playerX,y=playerY()-25;
+      ctx.globalAlpha=Math.min(1,state.muzzleFlash/.07);
+      ctx.fillStyle='#fff8be';ctx.shadowColor='#ffcc70';ctx.shadowBlur=18;
+      for(const side of [-1,1]){
+        ctx.beginPath();ctx.ellipse(x+side*8,y-9,3.5,11,0,0,Math.PI*2);ctx.fill();
+      }
+    }
+    ctx.restore();
+  }
+  function drawBlastRings(){
+    ctx.save();
+    for(const ring of state.blastRings){
+      const p=1-ring.life/ring.max,r=8+p*45;
+      const glow=ctx.createRadialGradient(ring.x,ring.y,0,ring.x,ring.y,r*1.3);
+      glow.addColorStop(0,'rgba(255,246,170,'+(0.55*(1-p))+')');
+      glow.addColorStop(.45,'rgba(255,128,57,'+(0.43*(1-p))+')');
+      glow.addColorStop(1,'rgba(244,51,56,0)');
+      ctx.fillStyle=glow;ctx.beginPath();ctx.arc(ring.x,ring.y,r*1.3,0,Math.PI*2);ctx.fill();
+      ctx.strokeStyle='rgba(255,219,135,'+(0.82*(1-p))+')';ctx.lineWidth=(3-p*2);
+      ctx.beginPath();ctx.arc(ring.x,ring.y,r,0,Math.PI*2);ctx.stroke();
+    }
+    ctx.restore();
+  }
   function spawn(){const lvl=state.elapsed;const double=Math.random()<clamp(.17+lvl*.008,.17,.68);const safe=Math.floor(Math.random()*3),blocks=double?[0,1,2].filter(l=>l!==safe):[chosen([0,1,2])];const startY=H*.19-45;for(const lane of blocks)state.obstacles.push({lane,y:startY,kind:'block',id:Math.random(),hit:false});let sparkLane;if(double)sparkLane=safe;else sparkLane=chosen([0,1,2].filter(l=>!blocks.includes(l)));if(Math.random()<.84)state.obstacles.push({lane:sparkLane,y:startY,kind:'spark',id:Math.random(),hit:false})}
-  function update(dt){state.frameTime+=dt;state.flash=Math.max(0,state.flash-dt*1.5);state.rumble=Math.max(0,state.rumble-dt*1.9);for(const p of state.particles){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx*=Math.max(0,1-dt*2);p.vy*=Math.max(0,1-dt*2);p.life-=dt}state.particles=state.particles.filter(p=>p.life>0);if(state.toastTime>0){state.toastTime-=dt;if(state.toastTime<=0)$('toast').classList.remove('show')}
+  function update(dt){state.frameTime+=dt;state.muzzleFlash=Math.max(0,state.muzzleFlash-dt);for(const ring of state.blastRings)ring.life-=dt;state.blastRings=state.blastRings.filter(r=>r.life>0);state.flash=Math.max(0,state.flash-dt*1.5);state.rumble=Math.max(0,state.rumble-dt*1.9);for(const p of state.particles){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx*=Math.max(0,1-dt*2);p.vy*=Math.max(0,1-dt*2);p.life-=dt}state.particles=state.particles.filter(p=>p.life>0);if(state.toastTime>0){state.toastTime-=dt;if(state.toastTime<=0)$('toast').classList.remove('show')}
     if(state.mode!=='playing')return;
     state.elapsed+=dt;state.score+=dt*(24+Math.min(state.elapsed,120)*.23);state.phaseTime=Math.max(0,state.phaseTime-dt);
     state.warningCooldown=Math.max(0,(state.warningCooldown||0)-dt);
@@ -268,14 +349,18 @@
     if(state.battleSoundTimer<=0){soundDistantBattle();state.battleSoundTimer=2.5+Math.random()*2.6;}
 
     state.spawnTime-=dt;if(state.spawnTime<=0){spawn();state.spawnTime=clamp(1.15-state.elapsed*.0058,.56,1.15)+rand(-.07,.08)}
+    state.fireTimer-=dt;
+    if(state.fireTimer<=0){fireAutocannon();state.fireTimer=.265;}
+
     const speed=H*(.32+Math.min(state.elapsed,100)*.0033);const py=playerY();state.playerX+=(laneX(state.lane,py)-state.playerX)*Math.min(1,dt*16);
-    for(const ob of state.obstacles){const prev=ob.y;ob.y+=speed*dt;
+    shootAndResolve(dt,speed);
+    for(const ob of state.obstacles){if(ob.destroyed)continue;const prev=ob.y;ob.y+=speed*dt;
       if(ob.kind==='block'&&!ob.warned&&ob.y>py*.66){
         ob.warned=true;
         if(state.warningCooldown<=0){soundMissile();state.warningCooldown=2.35;}
       }
 if(!ob.hit&&prev<py && ob.y>=py){ob.hit=true;if(ob.lane===state.lane){if(ob.kind==='block'){if(state.phaseTime>0){state.score+=40;burst(laneX(ob.lane,py),py,'#6ffdf7',16,125);soundNoise(.23,.095,1700,600,'bandpass')}else{end();break}}else{state.combo=Math.min(state.combo+1,7);const gained=60+state.combo*15;state.score+=gained;state.charge=Math.min(100,state.charge+34);burst(laneX(ob.lane,py),py,'#6effe5',15,140);soundPickup(state.combo);haptic(15);if(state.charge>=100)toast('PHASE READY!');else if(state.combo%3===0)toast('+'+gained+' · '+state.combo+'× COMBO')}}else if(ob.kind==='block'){state.score+=15;soundNoise(.25,.049,2100,440,'bandpass')}else{state.combo=0}}}
-    state.obstacles=state.obstacles.filter(ob=>ob.y<H+90);if(state.score>state.best){/* Personal best is saved after run */}updateHud()
+    state.obstacles=state.obstacles.filter(ob=>!ob.destroyed&&ob.y<H+90);if(state.score>state.best){/* Personal best is saved after run */}updateHud()
   }
   function roundRect(x,y,w,h,r){ctx.beginPath();ctx.roundRect(x,y,w,h,r)}
   function glowingLine(x1,y1,x2,y2,color,width,blur=15,alpha=1){ctx.save();ctx.strokeStyle=color;ctx.lineWidth=width;ctx.shadowColor=color;ctx.shadowBlur=blur;ctx.globalAlpha=alpha;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore()}
@@ -517,7 +602,7 @@ if(!ob.hit&&prev<py && ob.y>=py){ob.hit=true;if(ob.lane===state.lane){if(ob.kind
     ctx.restore();
   }
   function drawParticles(){ctx.save();for(const p of state.particles){ctx.globalAlpha=clamp(p.life/p.max,0,1);ctx.fillStyle=p.color;ctx.shadowColor=p.color;ctx.shadowBlur=8;ctx.beginPath();ctx.arc(p.x,p.y,p.r*clamp(p.life/p.max,.1,1),0,Math.PI*2);ctx.fill()}ctx.restore()}
-  function draw(){ctx.save();if(state.rumble>.03)ctx.translate(rand(-8,8)*state.rumble,rand(-8,8)*state.rumble);background();for(const ob of state.obstacles){drawObstacle(ob)}if(state.mode!=='menu')drawPlayer();drawParticles();if(state.flash>.01){ctx.fillStyle=`rgba(105,239,255,${state.flash*.08})`;ctx.fillRect(0,0,W,H)}ctx.restore()}
+  function draw(){ctx.save();if(state.rumble>.03)ctx.translate(rand(-8,8)*state.rumble,rand(-8,8)*state.rumble);background();for(const ob of state.obstacles){if(!ob.destroyed)drawObstacle(ob)}drawShots();if(state.mode!=='menu')drawPlayer();drawBlastRings();drawParticles();if(state.flash>.01){ctx.fillStyle=`rgba(105,239,255,${state.flash*.08})`;ctx.fillRect(0,0,W,H)}ctx.restore()}
   function loop(ms){const t=ms*.001;const dt=Math.min(.04,Math.max(0,t-last));last=t;update(dt);draw();raf=requestAnimationFrame(loop)}
   $('start').addEventListener('click',start);$('restart').addEventListener('click',start);$('resume').addEventListener('click',()=>setMode('playing'));$('quit').addEventListener('click',()=>{reset();setMode('menu')});$('pause').addEventListener('click',()=>{if(state.mode==='playing')setMode('paused')});$('left').addEventListener('click',()=>move(-1));$('right').addEventListener('click',()=>move(1));phaseBtn.addEventListener('click',phase);
   $('sound').addEventListener('click',()=>{state.sound=!state.sound;safeWrite(STORAGE_SOUND,state.sound?'on':'off');$('sound').setAttribute('aria-label',state.sound?'Mute sound':'Unmute sound');$('sound-icon').setAttribute('d',state.sound?'M11 5 6 9H3v6h3l5 4V5Zm4 4a5 5 0 0 1 0 6m3-9a9 9 0 0 1 0 12':'M11 5 6 9H3v6h3l5 4V5Zm5 4 5 6m0-6-5 6');if(state.sound){audioReady();audioTone(790,.16,'sine',.05,1100);startEngine();toast('SOUND ON')}else{stopEngine();toast('SOUND OFF')}});
