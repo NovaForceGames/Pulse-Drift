@@ -11,7 +11,7 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" type="image/svg+xml" href="icon.svg">
   
-  <title>PULSE DRIFT — WARZONE V8 · DRONES & BOMBS</title>
+  <title>PULSE DRIFT | NovaForce Games — WARZONE V8</title>
   <style>
     :root { color-scheme:dark; --aqua:#5dfcf1; --pink:#f05dff; --yellow:#ffdf88; --ink:#070b19; --muted:#94a6c9; --line:rgba(143,217,255,.16); }
     *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -47,6 +47,9 @@
     .overlay.hidden{display:none}
     .panel{position:relative;width:min(438px,100%);padding:clamp(25px,5vw,36px);border-radius:28px;border:1px solid rgba(130,194,242,.22);background:linear-gradient(143deg,rgba(20,34,68,.91),rgba(10,13,38,.96) 60%,rgba(23,15,48,.95));box-shadow:0 28px 90px rgba(0,0,0,.56),inset 0 1px 0 rgba(255,255,255,.09);text-align:center;overflow:hidden}
     .panel::before{content:"";position:absolute;inset:0 0 auto;height:3px;background:linear-gradient(90deg,transparent,var(--aqua),var(--pink),transparent)}
+    .novaforce-kicker{display:flex;flex-direction:column;gap:6px;align-items:center}
+    .novaforce-wordmark{font-weight:1000;color:#9afdf4;letter-spacing:.21em;font-size:15px;text-shadow:0 0 15px #4ceded7c}
+    .novaforce-subline{font-weight:850;font-size:9px;letter-spacing:.18em;color:#b9c7e9}
     .kicker{font-size:10px;letter-spacing:.32em;font-weight:900;color:var(--aqua);margin-bottom:14px}
     h1{font-size:clamp(46px,11vw,68px);letter-spacing:-.075em;line-height:.86;margin:8px 0 18px;font-weight:1000;text-shadow:0 0 50px #02d5ef50}
     h1 span{color:var(--aqua);display:block;letter-spacing:.03em;margin-top:9px}h2{font-size:clamp(34px,9vw,48px);letter-spacing:-.05em;margin:3px 0 10px}
@@ -97,7 +100,7 @@
     <button id="right" class="move-btn" aria-label="Move right"><svg viewBox="0 0 24 24"><path d="m9.5 5 7 7-7 7"/></svg></button>
   </nav>
   <section id="start-screen" class="overlay" aria-label="Start screen">
-    <div class="panel"><div class="kicker">FUTURISTIC JET COMBAT · WARZONE</div><div class="mini-visual" aria-hidden="true"><div class="lane"></div><div class="lane"></div><div class="lane"></div></div><h1>PULSE<span>DRIFT</span></h1><p class="lead">AUTO FIRE is on. Dodge shielded drones and alarm-triggered armored bombs that take 5 hits. Start with 5 lives; gain bonuses as you score.</p><div class="chips"><span class="chip">♥ 5 LIVES</span><span class="chip">🔫 AUTO FIRE</span><span class="chip">↔ SWIPE TO AIM</span><span class="chip">✦ GRAB ENERGY</span><span class="chip">⚡ PHASE TO SURVIVE</span></div><button id="start" class="primary">START RUN ↗</button><div class="muted">Free to play · Offline-ready · No account needed</div></div>
+    <div class="panel"><div class="kicker novaforce-kicker"><span class="novaforce-wordmark">✦ NOVAFORCE</span><span class="novaforce-subline">GAMES PRESENTS · WARZONE V8</span></div><div class="mini-visual" aria-hidden="true"><div class="lane"></div><div class="lane"></div><div class="lane"></div></div><h1>PULSE<span>DRIFT</span></h1><p class="lead">AUTO FIRE is on. Dodge shielded drones and alarm-triggered armored bombs that take 5 hits. Start with 5 lives; gain bonuses as you score.</p><div class="chips"><span class="chip">♥ 5 LIVES</span><span class="chip">🔫 AUTO FIRE</span><span class="chip">↔ SWIPE TO AIM</span><span class="chip">✦ GRAB ENERGY</span><span class="chip">⚡ PHASE TO SURVIVE</span></div><button id="start" class="primary">START RUN ↗</button><div class="muted">A NovaForce Games title · Free to play · No account needed</div></div>
   </section>
   <section id="pause-screen" class="overlay hidden" aria-label="Pause screen"><div class="panel"><div class="kicker">STAY IN CONTROL</div><h2>PAUSED</h2><p class="lead">Your run is safe. Continue whenever you are ready.</p><div class="buttons"><button id="resume" class="primary">RESUME RUN ↗</button><button id="quit" class="secondary">BACK TO MENU</button></div></div></section>
   <section id="end-screen" class="overlay hidden" aria-label="Game over screen"><div class="panel"><div class="kicker" id="end-kicker">SIGNAL LOST</div><h2>RUN COMPLETE</h2><p class="lead" id="end-message">Every run makes you faster. Go for a new best!</p><div class="result"><div class="cell"><small>YOUR SCORE</small><strong id="final-score">0</strong></div><div class="cell"><small>PERSONAL BEST</small><strong id="final-best">0</strong></div></div><div class="buttons"><button id="restart" class="primary">TRY AGAIN ↗</button><button id="share" class="secondary">SHARE THE GAME ↗</button></div></div></section>
@@ -705,7 +708,7 @@ if(!ob.hit&&prev<py && ob.y>=py){ob.hit=true;if(ob.lane===state.lane){if(ob.kind
   function loop(ms){const t=ms*.001;const dt=Math.min(.04,Math.max(0,t-last));last=t;update(dt);draw();raf=requestAnimationFrame(loop)}
   $('start').addEventListener('click',start);$('restart').addEventListener('click',start);$('resume').addEventListener('click',()=>setMode('playing'));$('quit').addEventListener('click',()=>{reset();setMode('menu')});$('pause').addEventListener('click',()=>{if(state.mode==='playing')setMode('paused')});$('left').addEventListener('click',()=>move(-1));$('right').addEventListener('click',()=>move(1));phaseBtn.addEventListener('click',phase);
   $('sound').addEventListener('click',()=>{state.sound=!state.sound;safeWrite(STORAGE_SOUND,state.sound?'on':'off');$('sound').setAttribute('aria-label',state.sound?'Mute sound':'Unmute sound');$('sound-icon').setAttribute('d',state.sound?'M11 5 6 9H3v6h3l5 4V5Zm4 4a5 5 0 0 1 0 6m3-9a9 9 0 0 1 0 12':'M11 5 6 9H3v6h3l5 4V5Zm5 4 5 6m0-6-5 6');if(state.sound){audioReady();audioTone(790,.16,'sine',.05,1100);startEngine();toast('SOUND ON')}else{stopEngine();toast('SOUND OFF')}});
-  $('share').addEventListener('click',async()=>{const url=(location.protocol==='http:'||location.protocol==='https:')?location.href:'';const data={title:'PULSE DRIFT',text:'Can you beat my score in PULSE DRIFT? ⚡',...(url?{url}:{})};try{if(navigator.share)await navigator.share(data);else if(navigator.clipboard && url){await navigator.clipboard.writeText(url);$('share').textContent='LINK COPIED ✓'}else{$('share').textContent='SHARE AFTER PUBLISHING'}}catch{}});
+  $('share').addEventListener('click',async()=>{const url=(location.protocol==='http:'||location.protocol==='https:')?location.href:'';const data={title:'PULSE DRIFT by NovaForce Games',text:'Can you beat my score in NovaForce Games: PULSE DRIFT? ⚡',...(url?{url}:{})};try{if(navigator.share)await navigator.share(data);else if(navigator.clipboard && url){await navigator.clipboard.writeText(url);$('share').textContent='LINK COPIED ✓'}else{$('share').textContent='SHARE AFTER PUBLISHING'}}catch{}});
   let startX=null,startY=null;
   canvas.addEventListener('pointerdown',e=>{if(state.mode!=='playing')return;startX=e.clientX;startY=e.clientY;canvas.setPointerCapture&&canvas.setPointerCapture(e.pointerId)});
   canvas.addEventListener('pointerup',e=>{if(state.mode!=='playing'||startX===null)return;let dx=e.clientX-startX;let dy=e.clientY-startY;if(Math.abs(dx)>25 && Math.abs(dx)>Math.abs(dy)*.65)move(dx>0?1:-1);else if(Math.abs(dx)<22&&Math.abs(dy)<22)move(e.clientX<W/2?-1:1);startX=null;startY=null});
