@@ -11,7 +11,8 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    # Pin stable runner; ubuntu-latest currently uses 26.04, where sdkmanager is not on PATH.
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
     steps:
@@ -23,16 +24,23 @@ jobs:
       # GitHub ubuntu-latest already includes the Android SDK and sdkmanager.
       # The setup-android action failed while replacing command-line tools,
       # so use the runner's preinstalled SDK instead.
-      - name: Check installed Android SDK
+      - name: Locate preinstalled Android SDK manager
         shell: bash
         run: |
+          set -euo pipefail
           echo "ANDROID_HOME=$ANDROID_HOME"
-          command -v sdkmanager
-          sdkmanager --version
-      - name: Install Android API 36 if missing
+          SDKMANAGER="$(find "$ANDROID_HOME/cmdline-tools" -type f -name sdkmanager | sort -V | tail -n 1)"
+          if [ -z "$SDKMANAGER" ]; then
+            echo "::error::Android SDK manager not found beneath $ANDROID_HOME/cmdline-tools"
+            find "$ANDROID_HOME" -maxdepth 3 -type d | head -n 80
+            exit 1
+          fi
+          echo "SDKMANAGER=$SDKMANAGER" >> "$GITHUB_ENV"
+          "$SDKMANAGER" --version
+      - name: Install Android API 36
         shell: bash
         run: |
-          sdkmanager --install "platforms;android-36" "build-tools;35.0.0"
+          "$SDKMANAGER" --sdk_root="$ANDROID_HOME" --install "platforms;android-36" "build-tools;35.0.0"
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.13'
