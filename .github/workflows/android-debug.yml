@@ -20,8 +20,19 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
-      - uses: android-actions/setup-android@v3
-      - run: sdkmanager "platforms;android-36" "build-tools;35.0.0"
+      # GitHub ubuntu-latest already includes the Android SDK and sdkmanager.
+      # The setup-android action failed while replacing command-line tools,
+      # so use the runner's preinstalled SDK instead.
+      - name: Check installed Android SDK
+        shell: bash
+        run: |
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          command -v sdkmanager
+          sdkmanager --version
+      - name: Install Android API 36 if missing
+        shell: bash
+        run: |
+          sdkmanager --install "platforms;android-36" "build-tools;35.0.0"
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.13'
