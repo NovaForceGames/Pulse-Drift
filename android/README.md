@@ -16,6 +16,20 @@ Open `android/` in Android Studio with Android SDK 36 and JDK 17; sync and run.
 
 Or visit GitHub **Actions → Android test APK → latest build → Artifacts** to download the APK once the workflow succeeds. The debug APK is for testing only.
 
+## Generate an AAB package for Google Play preparation
+
+Open GitHub **Actions → Android AAB package (unsigned test only)**:
+https://github.com/NovaForceGames/Pulse-Drift/actions/workflows/android-aab.yml
+
+The workflow builds `android/app/build/outputs/bundle/release/app-release.aab` and uploads
+`PULSE-DRIFT-AAB-UNSIGNED-NOT-FOR-PLAY` as a ZIP artifact.
+
+**Important:** This AAB is an unsigned build validation artifact, not a Google Play
+upload. A production AAB must be signed with a stable private upload key owned
+and backed up by the developer. Never publish that key or its passwords in GitHub,
+the chat, screenshots, or source files. We will configure a signed release only
+after a private key-storage method and real-device testing are ready.
+
 ## Before public release
 
 1. Open your own [Google Play Console](https://play.google.com/console) and [AdMob](https://admob.google.com/) accounts.
