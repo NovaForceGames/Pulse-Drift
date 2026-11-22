@@ -1,10 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-<defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#192553"/><stop offset="1" stop-color="#090b1b"/></linearGradient><linearGradient id="ship" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#eaffff"/><stop offset="1" stop-color="#45ffe1"/></linearGradient></defs>
-<rect width="512" height="512" rx="106" fill="url(#bg)"/>
-<path d="M85 375 220 112M427 375 292 112" stroke="#55eaff" stroke-width="13" opacity=".45"/>
-<path d="M130 383 228 194M382 383 284 194" stroke="#9aa8ff" stroke-width="4" opacity=".6"/>
-<path d="M256 112c-18 38-72 174-80 232l80-30 80 30c-8-58-62-194-80-232Z" fill="url(#ship)"/>
-<path d="m256 156-26 115h52z" fill="#193661"/>
-<path d="M218 361h76l-38 93Z" fill="#ce58ff" opacity=".85"/>
-<circle cx="256" cy="244" r="7" fill="#fff"/>
+<defs>
+<linearGradient id="bg" x1=".1" y1="0" x2=".9" y2="1"><stop stop-color="#2c3855"/><stop offset=".55" stop-color="#301b38"/><stop offset="1" stop-color="#100b1b"/></linearGradient>
+<linearGradient id="jet" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#a7eeff"/><stop offset=".55" stop-color="#e4fbff"/><stop offset="1" stop-color="#367fba"/></linearGradient>
+<radialGradient id="blast"><stop stop-color="#fff1b0"/><stop offset=".35" stop-color="#ffab51"/><stop offset=".75" stop-color="#eb4a52"/><stop offset="1" stop-color="#f8425900"/></radialGradient>
+</defs>
+<rect width="512" height="512" rx="110" fill="url(#bg)"/>
+<path d="M42 325 85 270 130 301 170 235 212 270 266 220 317 285 371 237 450 312v190H42Z" fill="#141c29"/>
+<circle cx="120" cy="175" r="95" fill="url(#blast)" opacity=".8"/><circle cx="392" cy="296" r="122" fill="url(#blast)" opacity=".65"/>
+<path d="M244 358 227 449 243 466 255 437 267 466 284 449 267 358Z" fill="#46d8f7" opacity=".9"/>
+<path d="M256 66 285 184 308 240 401 289 417 334 301 319 294 395 269 376 256 353 243 376 218 395 211 319 95 334 111 289 204 240 227 184Z" fill="url(#jet)" stroke="#6af3ff" stroke-width="6"/>
+<path d="M256 128 274 245 256 298 238 245Z" fill="#174f79" stroke="#b1faff" stroke-width="4"/>
+<path d="M124 310 213 275M388 310 299 275" stroke="#cdf6ff" stroke-width="4" opacity=".6"/>
 </svg>
