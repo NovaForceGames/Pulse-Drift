@@ -11,7 +11,7 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" type="image/svg+xml" href="icon.svg">
   
-  <title>PULSE DRIFT — WARZONE V7 · 5 LIVES</title>
+  <title>PULSE DRIFT | NovaForce Games — WARZONE V8</title>
   <style>
     :root { color-scheme:dark; --aqua:#5dfcf1; --pink:#f05dff; --yellow:#ffdf88; --ink:#070b19; --muted:#94a6c9; --line:rgba(143,217,255,.16); }
     *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -47,6 +47,9 @@
     .overlay.hidden{display:none}
     .panel{position:relative;width:min(438px,100%);padding:clamp(25px,5vw,36px);border-radius:28px;border:1px solid rgba(130,194,242,.22);background:linear-gradient(143deg,rgba(20,34,68,.91),rgba(10,13,38,.96) 60%,rgba(23,15,48,.95));box-shadow:0 28px 90px rgba(0,0,0,.56),inset 0 1px 0 rgba(255,255,255,.09);text-align:center;overflow:hidden}
     .panel::before{content:"";position:absolute;inset:0 0 auto;height:3px;background:linear-gradient(90deg,transparent,var(--aqua),var(--pink),transparent)}
+    .novaforce-kicker{display:flex;flex-direction:column;gap:6px;align-items:center}
+    .novaforce-wordmark{font-weight:1000;color:#9afdf4;letter-spacing:.21em;font-size:15px;text-shadow:0 0 15px #4ceded7c}
+    .novaforce-subline{font-weight:850;font-size:9px;letter-spacing:.18em;color:#b9c7e9}
     .kicker{font-size:10px;letter-spacing:.32em;font-weight:900;color:var(--aqua);margin-bottom:14px}
     h1{font-size:clamp(46px,11vw,68px);letter-spacing:-.075em;line-height:.86;margin:8px 0 18px;font-weight:1000;text-shadow:0 0 50px #02d5ef50}
     h1 span{color:var(--aqua);display:block;letter-spacing:.03em;margin-top:9px}h2{font-size:clamp(34px,9vw,48px);letter-spacing:-.05em;margin:3px 0 10px}
@@ -67,6 +70,10 @@
     .buttons{display:grid;gap:10px}
     .toast{z-index:4;position:absolute;left:50%;top:30%;transform:translateX(-50%) translateY(8px);pointer-events:none;opacity:0;transition:opacity .17s,transform .17s;text-shadow:0 0 22px #5dfcf1a0;font-size:17px;white-space:nowrap;font-weight:1000;letter-spacing:.09em;color:var(--aqua)}
     .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+    .special-warning{position:absolute;z-index:5;top:calc(127px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);max-width:95vw;white-space:nowrap;padding:9px 13px;border-radius:11px;background:#631c32ec;border:1px solid #ff9673;color:#fff2bd;font-size:11px;font-weight:950;letter-spacing:.09em;box-shadow:0 0 23px #ff546d8a;opacity:0;pointer-events:none}
+    .special-warning.active{opacity:1;animation:warnpulse .4s alternate infinite}
+    @keyframes warnpulse{to{background:#a32d3cef;color:#fff;box-shadow:0 0 37px #ff546de0}}
+    @media(prefers-reduced-motion:reduce){.special-warning.active{animation:none}}
     .lower-hint{position:absolute;z-index:2;left:50%;bottom:calc(112px + env(safe-area-inset-bottom));transform:translateX(-50%);font-size:10px;white-space:nowrap;color:#899bc3;letter-spacing:.08em;opacity:.72;pointer-events:none}
     #app:not([data-mode="playing"]) .lower-hint{display:none}
     @media(max-width:380px){.hud{left:10px;right:10px}.stat{padding:9px 10px;min-width:79px}.stat b{font-size:22px}.stat.best b{font-size:17px}.icon-btn{width:38px;height:38px}.move-btn{height:62px}.phase-btn{height:69px;flex-basis:100px}.controls{gap:9px;bottom:calc(12px + env(safe-area-inset-bottom))}.panel{padding:24px}.overline{top:calc(86px + env(safe-area-inset-top))}}
@@ -85,7 +92,7 @@
     </div>
   </header>
   <div class="overline health-strip" id="health" role="status" aria-live="polite">♥ ♥ ♥ ♥ ♥ · 5 LIVES</div>
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div><div class="special-warning" id="incoming">⚠ DANGER</div>
   <div class="lower-hint">AUTO FIRE ON · SWIPE TO AIM · PHASE TO SURVIVE</div>
   <nav class="controls" aria-label="Game controls">
     <button id="left" class="move-btn" aria-label="Move left"><svg viewBox="0 0 24 24"><path d="m14.5 5-7 7 7 7"/></svg></button>
@@ -93,7 +100,7 @@
     <button id="right" class="move-btn" aria-label="Move right"><svg viewBox="0 0 24 24"><path d="m9.5 5 7 7-7 7"/></svg></button>
   </nav>
   <section id="start-screen" class="overlay" aria-label="Start screen">
-    <div class="panel"><div class="kicker">FUTURISTIC JET COMBAT · WARZONE</div><div class="mini-visual" aria-hidden="true"><div class="lane"></div><div class="lane"></div><div class="lane"></div></div><h1>PULSE<span>DRIFT</span></h1><p class="lead">Fly with AUTO FIRE! You have 5 lives; earn +1 bonus life every 1,200 points, up to 8 lives. Dodge missiles and keep fighting!</p><div class="chips"><span class="chip">♥ 5 LIVES</span><span class="chip">🔫 AUTO FIRE</span><span class="chip">↔ SWIPE TO AIM</span><span class="chip">✦ GRAB ENERGY</span><span class="chip">⚡ PHASE TO SURVIVE</span></div><button id="start" class="primary">START RUN ↗</button><div class="muted">Free to play · Offline-ready · No account needed</div></div>
+    <div class="panel"><div class="kicker novaforce-kicker"><span class="novaforce-wordmark">✦ NOVAFORCE</span><span class="novaforce-subline">GAMES PRESENTS · WARZONE V8</span></div><div class="mini-visual" aria-hidden="true"><div class="lane"></div><div class="lane"></div><div class="lane"></div></div><h1>PULSE<span>DRIFT</span></h1><p class="lead">AUTO FIRE is on. Dodge shielded drones and alarm-triggered armored bombs that take 5 hits. Start with 5 lives; gain bonuses as you score.</p><div class="chips"><span class="chip">♥ 5 LIVES</span><span class="chip">🔫 AUTO FIRE</span><span class="chip">↔ SWIPE TO AIM</span><span class="chip">✦ GRAB ENERGY</span><span class="chip">⚡ PHASE TO SURVIVE</span></div><button id="start" class="primary">START RUN ↗</button><div class="muted">A NovaForce Games title · Free to play · No account needed</div></div>
   </section>
   <section id="pause-screen" class="overlay hidden" aria-label="Pause screen"><div class="panel"><div class="kicker">STAY IN CONTROL</div><h2>PAUSED</h2><p class="lead">Your run is safe. Continue whenever you are ready.</p><div class="buttons"><button id="resume" class="primary">RESUME RUN ↗</button><button id="quit" class="secondary">BACK TO MENU</button></div></div></section>
   <section id="end-screen" class="overlay hidden" aria-label="Game over screen"><div class="panel"><div class="kicker" id="end-kicker">SIGNAL LOST</div><h2>RUN COMPLETE</h2><p class="lead" id="end-message">Every run makes you faster. Go for a new best!</p><div class="result"><div class="cell"><small>YOUR SCORE</small><strong id="final-score">0</strong></div><div class="cell"><small>PERSONAL BEST</small><strong id="final-best">0</strong></div></div><div class="buttons"><button id="restart" class="primary">TRY AGAIN ↗</button><button id="share" class="secondary">SHARE THE GAME ↗</button></div></div></section>
@@ -108,7 +115,7 @@
   const STORAGE_BEST='pulse-drift-best-v1',STORAGE_SOUND='pulse-drift-sound-v1';
   const safeRead=(key,fallback)=>{try{return localStorage.getItem(key)??fallback}catch{return fallback}};
   const safeWrite=(key,val)=>{try{localStorage.setItem(key,String(val))}catch{}};
-  const state={mode:'menu', score:0,best:Math.max(0,Number(safeRead(STORAGE_BEST,0))||0),elapsed:0,lane:1,playerX:0,charge:0,phaseTime:0,combo:0,spawnTime:.65,lives:5,maxLives:8,hitShield:0,nextLifeScore:1200,fireTimer:0,shots:[],blastRings:[],destroyedRockets:0,muzzleFlash:0,obstacles:[],particles:[],stars:[],rumble:0,sound:safeRead(STORAGE_SOUND,'on')==='on',toastTime:0,frameTime:0,flash:0,runId:0};
+  const state={mode:'menu', score:0,best:Math.max(0,Number(safeRead(STORAGE_BEST,0))||0),elapsed:0,lane:1,playerX:0,charge:0,phaseTime:0,combo:0,spawnTime:.65,lives:5,maxLives:8,hitShield:0,nextLifeScore:1200,specialTimer:7.5,alertTime:0,fireTimer:0,shots:[],blastRings:[],destroyedRockets:0,muzzleFlash:0,obstacles:[],particles:[],stars:[],rumble:0,sound:safeRead(STORAGE_SOUND,'on')==='on',toastTime:0,frameTime:0,flash:0,runId:0};
   let W=0,H=0,DPR=1,last=0,raf=0, audio=null;
   const clamp=(x,min,max)=>Math.max(min,Math.min(max,x));
   const fmt=n=>Math.max(0,Math.floor(n)).toLocaleString('en-US');
@@ -254,7 +261,7 @@
   function haptic(ms=13){if(navigator.vibrate)try{navigator.vibrate(ms)}catch{}}
   function toast(msg,color='#5dfcf1'){const el=$('toast');el.textContent=msg;el.style.color=color;el.classList.add('show');state.toastTime=.95}
   function updateHud(){healthEl.textContent='♥ '.repeat(state.lives).trim()+'  ·  '+state.lives+' LIVES';scoreEl.textContent=String(Math.floor(state.score)).padStart(5,'0');bestEl.textContent=String(Math.floor(state.best)).padStart(5,'0');const charge=Math.floor(state.charge);phaseBtn.style.setProperty('--meter',charge+'%');phaseBtn.style.setProperty('--charge',charge/100);phaseBtn.classList.toggle('ready',charge>=100 && state.phaseTime<=0);phaseLabel.textContent=state.phaseTime>0?'PHASE ACTIVE':charge>=100?'READY · TAP':charge+'% CHARGE'}
-  function reset(){state.runId++;state.score=0;state.elapsed=0;state.lives=5;state.hitShield=0;state.nextLifeScore=1200;state.lane=1;state.playerX=laneX(1,playerY());state.charge=0;state.phaseTime=0;state.combo=0;state.spawnTime=.9;state.fireTimer=.08;state.shots=[];state.blastRings=[];state.destroyedRockets=0;state.muzzleFlash=0;state.warningCooldown=0;state.battleSoundTimer=1.25;state.obstacles=[];state.particles=[];state.rumble=0;state.flash=0;state.toastTime=0;$('toast').classList.remove('show');updateHud()}
+  function reset(){state.runId++;state.score=0;state.elapsed=0;state.lives=5;state.hitShield=0;state.nextLifeScore=1200;state.lane=1;state.playerX=laneX(1,playerY());state.charge=0;state.phaseTime=0;state.combo=0;state.spawnTime=.9;state.specialTimer=7.5;state.alertTime=0;$('incoming').classList.remove('active');state.fireTimer=.08;state.shots=[];state.blastRings=[];state.destroyedRockets=0;state.muzzleFlash=0;state.warningCooldown=0;state.battleSoundTimer=1.25;state.obstacles=[];state.particles=[];state.rumble=0;state.flash=0;state.toastTime=0;$('toast').classList.remove('show');updateHud()}
   function loseLife(){
     if(state.mode!=='playing'||state.hitShield>0||state.phaseTime>0)return;
     state.lives=Math.max(0,state.lives-1);
@@ -304,13 +311,24 @@
       const fromY=shell.y,toY=fromY-H*1.12*dt;
       let hit=false;
       for(const ob of state.obstacles){
-        if(ob.kind!=='block'||ob.destroyed||ob.lane!==shell.lane)continue;
+        if(!['block','bomb','drone'].includes(ob.kind)||ob.destroyed||ob.lane!==shell.lane)continue;
         const futureY=ob.y+speed*dt;
         const collisionPadding=Math.max(9,Math.min(W*.74,470)*trackScale(ob.y)/3*.18);
         // Swept hit test: reliable even when phones skip a frame.
         if(fromY-ob.y>=-collisionPadding&&toY-futureY<=collisionPadding){
-          ob.destroyed=true;
           hit=true;
+          if(ob.kind==='drone'){
+            ob.damaged=.15;burst(laneX(ob.lane,ob.y),ob.y,'#f88bff',4,45);
+            break;
+          }
+          if(ob.kind==='bomb'){
+            ob.hp--;ob.damaged=.17;
+            burst(laneX(ob.lane,ob.y),ob.y,'#ffd17b',6,60);
+            audioTone(290,.08,'triangle',.03,135);
+            if(ob.hp>0)break;
+            state.score+=300;toast('HEAVY BOMB +300','#ffe69e');
+          }
+          ob.destroyed=true;
           const bx=laneX(ob.lane,ob.y),by=ob.y;
           state.score+=100;state.destroyedRockets++;
           burst(bx,by,'#ffb15a',23,165);
@@ -367,6 +385,53 @@
     }
     ctx.restore();
   }
+  function specialAlarm(){
+    audioTone(870,.17,'sawtooth',.046,490);
+    setTimeout(()=>{if(state.mode==='playing')audioTone(870,.17,'sawtooth',.046,490)},220);
+    setTimeout(()=>{if(state.mode==='playing')audioTone(870,.17,'sawtooth',.046,490)},440);
+  }
+  function spawnSpecial(){
+    if(state.obstacles.some(ob=>ob.kind==='bomb'||ob.kind==='drone'))return;
+    const kind=Math.random()<.55?'bomb':'drone';
+    const lane=Math.floor(Math.random()*3);
+    // Clear ordinary missiles to ensure at least two fair escape lanes.
+    state.obstacles=state.obstacles.filter(ob=>ob.kind==='spark');
+    const hp=kind==='bomb'?5:9999;
+    state.obstacles.push({kind,lane,y:H*.19-44,id:Math.random(),hit:false,damaged:0,hp,maxHp:hp});
+    state.alertTime=2.9;
+    $('incoming').textContent=kind==='bomb'?'⚠ ARMORED BOMB · 5 HITS':'⚠ SHIELD DRONE · EVADE';
+    $('incoming').classList.add('active');
+    state.specialTimer=10+Math.random()*4;
+    state.spawnTime=1.0;
+    specialAlarm();
+  }
+  function drawSpecial(ob,x,y,size){
+    const r=Math.max(9,size*.53), t=state.frameTime;
+    ctx.save();ctx.translate(x,y);
+    if(ob.kind==='bomb'){
+      ctx.shadowColor='#ff713e';ctx.shadowBlur=20;
+      const g=ctx.createRadialGradient(-r*.35,-r*.4,2,0,0,r*1.2);
+      g.addColorStop(0,ob.damaged>0?'#ffffff':'#bfc6c9');
+      g.addColorStop(.42,'#697481');g.addColorStop(1,'#1e2435');
+      ctx.fillStyle=g;ctx.strokeStyle='#ffa45c';ctx.lineWidth=2;
+      ctx.beginPath();ctx.arc(0,0,r,0,Math.PI*2);ctx.fill();ctx.stroke();
+      ctx.strokeStyle='#ffc06d';ctx.lineWidth=3;ctx.beginPath();ctx.arc(0,0,r*.63,0,Math.PI*2);ctx.stroke();
+      ctx.fillStyle='#ff534d';ctx.beginPath();ctx.arc(0,0,r*.24,0,Math.PI*2);ctx.fill();
+      for(let i=0;i<6;i++){ctx.save();ctx.rotate(i*Math.PI/3+t*.1);ctx.fillStyle='#d88336';ctx.fillRect(-r*.14,-r*1.14,r*.28,r*.31);ctx.restore()}
+      ctx.shadowBlur=0;ctx.fillStyle='#151b2c';ctx.fillRect(-r,-r*1.5,r*2,5);
+      ctx.fillStyle='#ffc66c';ctx.fillRect(-r,-r*1.5,r*2*Math.max(0,ob.hp/ob.maxHp),5);
+    }else{
+      ctx.shadowColor='#e94bfc';ctx.shadowBlur=22;
+      ctx.fillStyle='#a443d466';ctx.strokeStyle=ob.damaged>0?'#ffffff':'#ff8cf5';ctx.lineWidth=2;
+      ctx.beginPath();ctx.ellipse(0,0,r*1.55,r*1.18,0,0,Math.PI*2);ctx.fill();ctx.stroke();
+      ctx.fillStyle='#36516b';ctx.strokeStyle='#b7eaff';
+      ctx.beginPath();ctx.moveTo(0,-r*.85);ctx.lineTo(r*1.35,-r*.18);ctx.lineTo(r*.62,r*.55);ctx.lineTo(-r*.62,r*.55);ctx.lineTo(-r*1.35,-r*.18);ctx.closePath();ctx.fill();ctx.stroke();
+      ctx.shadowBlur=0;ctx.fillStyle='#f650ac';ctx.beginPath();ctx.arc(0,-r*.05,r*.26,0,Math.PI*2);ctx.fill();
+      for(const side of [-1,1]){ctx.save();ctx.translate(side*r,0);ctx.rotate(t*13);
+        ctx.strokeStyle='#9cffff';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-r*.35,0);ctx.lineTo(r*.35,0);ctx.moveTo(0,-r*.35);ctx.lineTo(0,r*.35);ctx.stroke();ctx.restore()}
+    }
+    ctx.restore();
+  }
   function spawn(){const lvl=state.elapsed;const double=Math.random()<clamp(.17+lvl*.008,.17,.68);const safe=Math.floor(Math.random()*3),blocks=double?[0,1,2].filter(l=>l!==safe):[chosen([0,1,2])];const startY=H*.19-45;for(const lane of blocks)state.obstacles.push({lane,y:startY,kind:'block',id:Math.random(),hit:false});let sparkLane;if(double)sparkLane=safe;else sparkLane=chosen([0,1,2].filter(l=>!blocks.includes(l)));if(Math.random()<.84)state.obstacles.push({lane:sparkLane,y:startY,kind:'spark',id:Math.random(),hit:false})}
   function update(dt){state.frameTime+=dt;state.muzzleFlash=Math.max(0,state.muzzleFlash-dt);for(const ring of state.blastRings)ring.life-=dt;state.blastRings=state.blastRings.filter(r=>r.life>0);state.flash=Math.max(0,state.flash-dt*1.5);state.rumble=Math.max(0,state.rumble-dt*1.9);for(const p of state.particles){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx*=Math.max(0,1-dt*2);p.vy*=Math.max(0,1-dt*2);p.life-=dt}state.particles=state.particles.filter(p=>p.life>0);if(state.toastTime>0){state.toastTime-=dt;if(state.toastTime<=0)$('toast').classList.remove('show')}
     if(state.mode!=='playing')return;
@@ -375,18 +440,26 @@
     state.battleSoundTimer=(state.battleSoundTimer??1.25)-dt;
     if(state.battleSoundTimer<=0){soundDistantBattle();state.battleSoundTimer=2.5+Math.random()*2.6;}
 
-    state.spawnTime-=dt;if(state.spawnTime<=0){spawn();state.spawnTime=clamp(1.15-state.elapsed*.0058,.56,1.15)+rand(-.07,.08)}
+    state.alertTime=Math.max(0,state.alertTime-dt);
+    if(state.alertTime===0)$('incoming').classList.remove('active');
+    const specialActive=state.obstacles.some(ob=>!ob.destroyed&&(ob.kind==='bomb'||ob.kind==='drone'));
+    state.specialTimer-=dt;
+    if(state.specialTimer<=0&&!specialActive)spawnSpecial();
+    if(!specialActive&&state.specialTimer>0){
+      state.spawnTime-=dt;
+      if(state.spawnTime<=0){spawn();state.spawnTime=clamp(1.15-state.elapsed*.0058,.56,1.15)+rand(-.07,.08)}
+    }
     state.fireTimer-=dt;
     if(state.fireTimer<=0){fireAutocannon();state.fireTimer=.265;}
 
     const speed=H*(.32+Math.min(state.elapsed,100)*.0033);const py=playerY();state.playerX+=(laneX(state.lane,py)-state.playerX)*Math.min(1,dt*16);
     shootAndResolve(dt,speed);
-    for(const ob of state.obstacles){if(ob.destroyed)continue;const prev=ob.y;ob.y+=speed*dt;
-      if(ob.kind==='block'&&!ob.warned&&ob.y>py*.66){
+    for(const ob of state.obstacles){if(ob.destroyed)continue;ob.damaged=Math.max(0,(ob.damaged||0)-dt);const prev=ob.y;ob.y+=speed*dt*(ob.kind==='bomb'?.8:1);
+      if((ob.kind==='block'||ob.kind==='bomb'||ob.kind==='drone')&&!ob.warned&&ob.y>py*.66){
         ob.warned=true;
         if(state.warningCooldown<=0){soundMissile();state.warningCooldown=2.35;}
       }
-if(!ob.hit&&prev<py && ob.y>=py){ob.hit=true;if(ob.lane===state.lane){if(ob.kind==='block'){if(state.phaseTime>0){state.score+=40;burst(laneX(ob.lane,py),py,'#6ffdf7',16,125);soundNoise(.23,.095,1700,600,'bandpass')}else if(state.hitShield<=0){loseLife();if(state.mode==='over')break}}else{state.combo=Math.min(state.combo+1,7);const gained=60+state.combo*15;state.score+=gained;state.charge=Math.min(100,state.charge+34);burst(laneX(ob.lane,py),py,'#6effe5',15,140);soundPickup(state.combo);haptic(15);if(state.charge>=100)toast('PHASE READY!');else if(state.combo%3===0)toast('+'+gained+' · '+state.combo+'× COMBO')}}else if(ob.kind==='block'){state.score+=15;soundNoise(.25,.049,2100,440,'bandpass')}else{state.combo=0}}}
+if(!ob.hit&&prev<py && ob.y>=py){ob.hit=true;if(ob.lane===state.lane){if(ob.kind==='block'||ob.kind==='bomb'||ob.kind==='drone'){if(state.phaseTime>0){state.score+=40;burst(laneX(ob.lane,py),py,'#6ffdf7',16,125);soundNoise(.23,.095,1700,600,'bandpass')}else if(state.hitShield<=0){loseLife();if(state.mode==='over')break}}else{state.combo=Math.min(state.combo+1,7);const gained=60+state.combo*15;state.score+=gained;state.charge=Math.min(100,state.charge+34);burst(laneX(ob.lane,py),py,'#6effe5',15,140);soundPickup(state.combo);haptic(15);if(state.charge>=100)toast('PHASE READY!');else if(state.combo%3===0)toast('+'+gained+' · '+state.combo+'× COMBO')}}else if(ob.kind==='block'||ob.kind==='bomb'||ob.kind==='drone'){state.score+=15;soundNoise(.25,.049,2100,440,'bandpass')}else{state.combo=0}}}
     state.obstacles=state.obstacles.filter(ob=>!ob.destroyed&&ob.y<H+90);awardBonusLives();if(state.score>state.best){/* Personal best is saved after run */}updateHud()
   }
   function roundRect(x,y,w,h,r){ctx.beginPath();ctx.roundRect(x,y,w,h,r)}
@@ -542,7 +615,8 @@ if(!ob.hit&&prev<py && ob.y>=py){ob.hit=true;if(ob.lane===state.lane){if(ob.kind
     const y=ob.y;if(y<H*.18-10)return;
     const alpha=clamp((y-H*.19+25)/90,.05,1);
     ctx.save();ctx.globalAlpha=alpha;
-    if(ob.kind==='block'){
+    if(ob.kind==='drone'||ob.kind==='bomb'){drawSpecial(ob,x,y,size)}
+    else if(ob.kind==='block'){
       // Hostile missile: fiery rear at the top, nose pointed down at the jet.
       const r=Math.max(4.8,size*.28),len=r*3,tt=state.frameTime;
       const fire=ctx.createLinearGradient(x,y-len*.6,x,y-len*2.4);
@@ -634,7 +708,7 @@ if(!ob.hit&&prev<py && ob.y>=py){ob.hit=true;if(ob.lane===state.lane){if(ob.kind
   function loop(ms){const t=ms*.001;const dt=Math.min(.04,Math.max(0,t-last));last=t;update(dt);draw();raf=requestAnimationFrame(loop)}
   $('start').addEventListener('click',start);$('restart').addEventListener('click',start);$('resume').addEventListener('click',()=>setMode('playing'));$('quit').addEventListener('click',()=>{reset();setMode('menu')});$('pause').addEventListener('click',()=>{if(state.mode==='playing')setMode('paused')});$('left').addEventListener('click',()=>move(-1));$('right').addEventListener('click',()=>move(1));phaseBtn.addEventListener('click',phase);
   $('sound').addEventListener('click',()=>{state.sound=!state.sound;safeWrite(STORAGE_SOUND,state.sound?'on':'off');$('sound').setAttribute('aria-label',state.sound?'Mute sound':'Unmute sound');$('sound-icon').setAttribute('d',state.sound?'M11 5 6 9H3v6h3l5 4V5Zm4 4a5 5 0 0 1 0 6m3-9a9 9 0 0 1 0 12':'M11 5 6 9H3v6h3l5 4V5Zm5 4 5 6m0-6-5 6');if(state.sound){audioReady();audioTone(790,.16,'sine',.05,1100);startEngine();toast('SOUND ON')}else{stopEngine();toast('SOUND OFF')}});
-  $('share').addEventListener('click',async()=>{const url=(location.protocol==='http:'||location.protocol==='https:')?location.href:'';const data={title:'PULSE DRIFT',text:'Can you beat my score in PULSE DRIFT? ⚡',...(url?{url}:{})};try{if(navigator.share)await navigator.share(data);else if(navigator.clipboard && url){await navigator.clipboard.writeText(url);$('share').textContent='LINK COPIED ✓'}else{$('share').textContent='SHARE AFTER PUBLISHING'}}catch{}});
+  $('share').addEventListener('click',async()=>{const url=(location.protocol==='http:'||location.protocol==='https:')?location.href:'';const data={title:'PULSE DRIFT by NovaForce Games',text:'Can you beat my score in NovaForce Games: PULSE DRIFT? ⚡',...(url?{url}:{})};try{if(navigator.share)await navigator.share(data);else if(navigator.clipboard && url){await navigator.clipboard.writeText(url);$('share').textContent='LINK COPIED ✓'}else{$('share').textContent='SHARE AFTER PUBLISHING'}}catch{}});
   let startX=null,startY=null;
   canvas.addEventListener('pointerdown',e=>{if(state.mode!=='playing')return;startX=e.clientX;startY=e.clientY;canvas.setPointerCapture&&canvas.setPointerCapture(e.pointerId)});
   canvas.addEventListener('pointerup',e=>{if(state.mode!=='playing'||startX===null)return;let dx=e.clientX-startX;let dy=e.clientY-startY;if(Math.abs(dx)>25 && Math.abs(dx)>Math.abs(dy)*.65)move(dx>0?1:-1);else if(Math.abs(dx)<22&&Math.abs(dy)<22)move(e.clientX<W/2?-1:1);startX=null;startY=null});
