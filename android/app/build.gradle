@@ -1,0 +1,49 @@
+plugins {
+    id 'com.android.application'
+}
+def demoAppId = 'ca-app-pub-3940256099942544~3347511713'
+def demoRewardId = 'ca-app-pub-3940256099942544/5224354917'
+def prodAppId = providers.gradleProperty('NOVAFORCE_ADMOB_APP_ID').orNull
+def prodRewardId = providers.gradleProperty('NOVAFORCE_REWARDED_UNIT_ID').orNull
+if ((prodAppId == null) != (prodRewardId == null)) {
+    throw new GradleException('Provide BOTH production AdMob IDs or neither.')
+}
+android {
+    namespace 'games.novaforce.pulsedrift'
+    compileSdk 36
+    defaultConfig {
+        applicationId 'games.novaforce.pulsedrift'
+        minSdk 24
+        targetSdk 36
+        versionCode 1
+        versionName '0.1-test'
+        manifestPlaceholders = [admobAppId: (prodAppId ?: demoAppId)]
+        buildConfigField 'String', 'REWARDED_AD_UNIT_ID', '"'+(prodRewardId ?: demoRewardId)+'"'
+    }
+    buildFeatures { buildConfig true }
+    buildTypes {
+        debug { debuggable true }
+        release {
+            minifyEnabled false
+            // Configure private upload signing before Google Play.
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+dependencies {
+    implementation 'androidx.webkit:webkit:1.12.1'
+    implementation 'com.google.android.gms:play-services-ads:25.5.0'
+    implementation 'com.google.android.ump:user-messaging-platform:4.0.0'
+}
+// Bundle the exact same HTML5 game used by GitHub Pages into the Android app.
+// The app works offline; ad requests need a network connection and consent.
+tasks.register('copyWebGame', Copy) {
+    from(rootProject.file('../index.html'))
+    from(rootProject.file('../privacy.html'))
+    from(rootProject.file('../icon.svg'))
+    into(file('src/main/assets'))
+}
+tasks.named('preBuild') { dependsOn(tasks.named('copyWebGame')) }
