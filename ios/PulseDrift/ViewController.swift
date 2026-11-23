@@ -13,9 +13,9 @@ final class ViewController: UIViewController {
         let config = WKWebViewConfiguration()
         config.allowsInlineMediaPlayback = true
         config.mediaTypesRequiringUserActionForPlayback = .all
-        config.userContentController.add(adsBridge, name: AdsBridge.handlerName)
-        let shim = WKUserScript(source: AdsBridge.jsShim, injectionTime: .atDocumentStart, forMainFrameOnly: true)
-        config.userContentController.addUserScript(shim)
+        // No real iOS rewarded-ad SDK is bundled yet. Do not inject the Android-style
+        // JavaScript shim: the game then correctly shows its labeled FREE TEST CONTINUE.
+        // Re-enable the bridge only when AdsService is backed by actual rewarded ads.
 
         webView = WKWebView(frame: .zero, configuration: config)
         webView.backgroundColor = UIColor(red: 7/255, green: 11/255, blue: 25/255, alpha: 1)
@@ -24,7 +24,7 @@ final class ViewController: UIViewController {
         webView.scrollView.isScrollEnabled = false
         webView.scrollView.contentInsetAdjustmentBehavior = .never
         webView.translatesAutoresizingMaskIntoConstraints = false
-        adsBridge.attach(webView: webView)
+        // Intentionally omit adsBridge.attach until the native ads SDK is integrated.
         view.addSubview(webView)
         NSLayoutConstraint.activate([
             webView.topAnchor.constraint(equalTo: view.topAnchor),
