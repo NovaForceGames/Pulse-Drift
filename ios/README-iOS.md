@@ -1,20 +1,27 @@
 # PULSE DRIFT — WARZONE · iOS
 
-Swift + WKWebView shell; the game runs from bundled local HTML5/Canvas files.
-Game source files are byte-identical to `index.html`, `privacy.html`, and `icon.svg` on the main branch.
+The iOS app uses Swift + WKWebView, displaying the HTML5/Canvas game from bundled local files.
+The current game source is copied from the existing Android/web game and loads offline.
+
+## Build verification
+- The unsigned iOS Xcode build has passed GitHub Actions, including Release configuration.
+- The offline HTML game bundle and application bundle identifier have been verified.
+- The full AppIcon set (1024, 180, 167, 152, 120, 87, 80, 76, 58, 40, 29px) is now present.
+- These icons were generated from the original vector icon.svg using scripts/generate_ios_icons.py,
+  avoiding upscaling of the old 512px raster while preserving the same visual design.
+- The GitHub simulator smoke test checks installation, launch and screenshot capture. Its result
+  should be considered separately from a successful compile.
 
 ## Ads
-The iOS bridge supplies a JavaScript compatibility shim for `NovaForceAndroidAds`,
-but `AdsService` is intentionally a **test stub** with no Google Mobile Ads SDK.
-It reports `onAdUnavailable` rather than granting a fake reward. Add Mobile Ads SDK,
-UMP consent, and ATT checks in a separate reviewed change.
-
-## Build
-Run the GitHub Actions "iOS build check" workflow on the `ios-preparation` branch,
-or build with Xcode. No Apple credentials are required for the unsigned build.
+The JavaScript bridge exposes the same API as Android for game compatibility, but the
+iOS AdsService is currently a stub: there is **no** Google Mobile Ads SDK or UMP
+implementation yet and no production ad delivery. Complete consent, ATT decisions
+where applicable, truthful App Privacy and native Ads SDK before app release.
 
 ## Pending before TestFlight
-- Restore the full app icon assets from Muse's reviewed ZIP (temporary empty catalog here).
-- Validate iPhone landscape/safe-area behavior and audio.
-- Connect AdMob iOS SDK and accurate privacy disclosures.
-- Enroll in Apple Developer Program and securely provision code signing.
+- Confirm successful simulator launch (not only simulator compilation).
+- Confirm the iOS app icon renders correctly in Xcode/Simulator.
+- Set up Apple Developer Program, App Store Connect app record, signing/provisioning.
+- Test with a real iPhone via TestFlight.
+- Confirm iOS privacy declarations and decide how to handle monetization in the first beta.
+- Validate UI safe areas, audio and any privacy-policy/website navigation.
