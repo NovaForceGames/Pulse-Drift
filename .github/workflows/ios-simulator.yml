@@ -57,9 +57,13 @@ jobs:
           sleep 5
           xcrun simctl io "$DEVICE_ID" screenshot ios-simulator-screenshot.png
           echo "iPhone Simulator installed and launched PULSE DRIFT successfully."
+          echo "### iPhone Simulator test" >> "$GITHUB_STEP_SUMMARY"
+          echo "App installed, launched and a screenshot was captured successfully." >> "$GITHUB_STEP_SUMMARY"
+          echo "The screenshot artifact upload is best-effort and is reported separately." >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload simulator evidence
         if: always()
+        continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
           name: ios-simulator-smoke-evidence
