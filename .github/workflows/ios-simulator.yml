@@ -1,0 +1,77 @@
+name: iOS simulator launch smoke test
+
+on:
+  push:
+    paths:
+      - '.github/workflows/ios-simulator.yml'
+      - 'ios/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  simulator-smoke:
+    runs-on: macos-26-intel
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - name: Build for iPhone Simulator
+        run: |
+          set -o pipefail
+          xcodebuild build \
+            -project ios/PulseDrift.xcodeproj \
+            -scheme PulseDrift \
+            -configuration Debug \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build-sim \
+            CODE_SIGNING_ALLOWED=NO \
+            | tee simulator-build.log
+
+      - name: Select available iPhone simulator
+        run: |
+          set -eu
+          xcrun simctl list devices available -j > available-simulators.json
+          ID=$(python3 -c 'import json; d=json.load(open("available-simulators.json")); print(next((x["udid"] for a in d["devices"].values() for x in a if x.get("isAvailable") and x["name"].startswith("iPhone")), ""))')
+          if [ -z "$ID" ]; then
+            echo "::error::No available iPhone Simulator runtime on this runner"
+            exit 1
+          fi
+          echo "DEVICE_ID=$ID" >> "$GITHUB_ENV"
+
+      - name: Boot simulator and launch game
+        timeout-minutes: 10
+        run: |
+          set -eu
+          xcrun simctl boot "$DEVICE_ID"
+          xcrun simctl bootstatus "$DEVICE_ID" -b
+          xcrun simctl install "$DEVICE_ID" build-sim/Build/Products/Debug-iphonesimulator/PulseDrift.app
+          xcrun simctl launch "$DEVICE_ID" games.novaforce.pulsedrift
+          sleep 5
+          xcrun simctl io "$DEVICE_ID" screenshot ios-simulator-screenshot.png
+          echo "iPhone Simulator installed and launched PULSE DRIFT successfully."
+
+      - name: Upload simulator evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-simulator-smoke-evidence
+          path: |
+            simulator-build.log
+            ios-simulator-screenshot.png
+            available-simulators.json
+          if-no-files-found: warn
+
+      - name: Shutdown simulator
+        if: always()
+        run: |
+          if [ -n "${DEVICE_ID:-}" ]; then
+            xcrun simctl shutdown "$DEVICE_ID" || true
+          fi
