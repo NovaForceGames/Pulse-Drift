@@ -133,7 +133,7 @@
   const STORAGE_BEST='pulse-drift-best-v1',STORAGE_SOUND='pulse-drift-sound-v1';
   const safeRead=(key,fallback)=>{try{return localStorage.getItem(key)??fallback}catch{return fallback}};
   const safeWrite=(key,val)=>{try{localStorage.setItem(key,String(val))}catch{}};
-  const state={mode:'menu', score:0,best:Math.max(0,Number(safeRead(STORAGE_BEST,0))||0),elapsed:0,lane:1,playerX:0,charge:0,phaseTime:0,combo:0,spawnTime:.65,lives:5,maxLives:8,hitShield:0,nextLifeScore:1200,specialTimer:5.5,alertTime:0,waveIndex:0,fireTimer:0,shots:[],blastRings:[],destroyedRockets:0,muzzleFlash:0,obstacles:[],particles:[],stars:[],rumble:0,sound:safeRead(STORAGE_SOUND,'on')==='on',toastTime:0,frameTime:0,flash:0,runId:0,continuesUsed:0,rewardPending:false};
+  const state={mode:'menu', score:0,best:Math.max(0,Number(safeRead(STORAGE_BEST,0))||0),elapsed:0,lane:1,playerX:0,charge:0,phaseTime:0,combo:0,spawnTime:.65,lives:5,maxLives:6,hitShield:0,nextLifeScore:5000,specialTimer:5.5,alertTime:0,waveIndex:0,fireTimer:0,shots:[],blastRings:[],destroyedRockets:0,muzzleFlash:0,obstacles:[],particles:[],stars:[],rumble:0,sound:safeRead(STORAGE_SOUND,'on')==='on',toastTime:0,frameTime:0,flash:0,runId:0,continuesUsed:0,rewardPending:false};
   let W=0,H=0,DPR=1,last=0,raf=0, audio=null;
   const clamp=(x,min,max)=>Math.max(min,Math.min(max,x));
   const fmt=n=>Math.max(0,Math.floor(n)).toLocaleString('en-US');
@@ -279,11 +279,11 @@
   function haptic(ms=13){if(navigator.vibrate)try{navigator.vibrate(ms)}catch{}}
   function toast(msg,color='#5dfcf1'){const el=$('toast');el.textContent=msg;el.style.color=color;el.classList.add('show');state.toastTime=.95}
   function updateHud(){healthEl.textContent='♥ '.repeat(state.lives).trim()+'  ·  '+state.lives+' LIVES';scoreEl.textContent=String(Math.floor(state.score)).padStart(5,'0');bestEl.textContent=String(Math.floor(state.best)).padStart(5,'0');const charge=Math.floor(state.charge);phaseBtn.style.setProperty('--meter',charge+'%');phaseBtn.style.setProperty('--charge',charge/100);phaseBtn.classList.toggle('ready',charge>=100 && state.phaseTime<=0);phaseLabel.textContent=state.phaseTime>0?'PHASE ACTIVE':charge>=100?'READY · TAP':charge+'% CHARGE'}
-  function reset(){state.runId++;state.continuesUsed=0;state.rewardPending=false;state.score=0;state.elapsed=0;state.lives=5;state.hitShield=0;state.nextLifeScore=1200;state.lane=1;state.playerX=laneX(1,playerY());state.charge=0;state.phaseTime=0;state.combo=0;state.spawnTime=.85;state.specialTimer=5.5;state.waveIndex=0;state.alertTime=0;$('incoming').classList.remove('active');state.fireTimer=.08;state.shots=[];state.blastRings=[];state.destroyedRockets=0;state.muzzleFlash=0;state.warningCooldown=0;state.battleSoundTimer=1.25;state.obstacles=[];state.particles=[];state.rumble=0;state.flash=0;state.toastTime=0;$('toast').classList.remove('show');updateHud()}
+  function reset(){state.runId++;state.continuesUsed=0;state.rewardPending=false;state.score=0;state.elapsed=0;state.lives=5;state.hitShield=0;state.nextLifeScore=5000;state.lane=1;state.playerX=laneX(1,playerY());state.charge=0;state.phaseTime=0;state.combo=0;state.spawnTime=.85;state.specialTimer=5.5;state.waveIndex=0;state.alertTime=0;$('incoming').classList.remove('active');state.fireTimer=.08;state.shots=[];state.blastRings=[];state.destroyedRockets=0;state.muzzleFlash=0;state.warningCooldown=0;state.battleSoundTimer=1.25;state.obstacles=[];state.particles=[];state.rumble=0;state.flash=0;state.toastTime=0;$('toast').classList.remove('show');updateHud()}
   function loseLife(){
     if(state.mode!=='playing'||state.hitShield>0||state.phaseTime>0)return;
     state.lives=Math.max(0,state.lives-1);
-    state.hitShield=1.5;
+    state.hitShield=1.15;
     state.flash=Math.max(state.flash,.34);
     state.rumble=Math.max(state.rumble,.31);
     state.combo=0;
@@ -297,7 +297,7 @@
   function awardBonusLives(){
     if(state.mode!=='playing')return;
     while(state.score>=state.nextLifeScore){
-      state.nextLifeScore+=1200;
+      state.nextLifeScore+=5000;
       if(state.lives<state.maxLives){
         state.lives++;
         audioTone(550,.19,'sine',.044,920);
@@ -484,7 +484,7 @@
     const level=state.elapsed;
     // Each row leaves at least one clear lane. Threats never fill all three lanes together.
     const safe=Math.floor(Math.random()*3);
-    const busy=level<3?0:Math.random()<clamp(.46+level*.003,.46,.80)?1:0;
+    const busy=level<3?0:Math.random()<clamp(.55+level*.0035,.55,.90)?1:0;
     const attackLanes=busy?[0,1,2].filter(l=>l!==safe):[chosen([0,1,2].filter(l=>l!==safe))];
     const startY=H*.19-45;
     const heavyReady=state.specialTimer<=0&&level>=5;
@@ -514,12 +514,12 @@
     state.spawnTime-=dt;
     if(state.spawnTime<=0){
       spawn();
-      state.spawnTime=clamp(.94-state.elapsed*.0029,.61,.94)+rand(-.045,.045);
+      state.spawnTime=clamp(.88-state.elapsed*.0036,.47,.88)+rand(-.045,.045);
     }
     state.fireTimer-=dt;
     if(state.fireTimer<=0){fireAutocannon();state.fireTimer=.265;}
 
-    const speed=H*(.32+Math.min(state.elapsed,100)*.0033);const py=playerY();state.playerX+=(laneX(state.lane,py)-state.playerX)*Math.min(1,dt*16);
+    const speed=H*(.34+Math.min(state.elapsed,100)*.004);const py=playerY();state.playerX+=(laneX(state.lane,py)-state.playerX)*Math.min(1,dt*16);
     shootAndResolve(dt,speed);
     for(const ob of state.obstacles){if(ob.destroyed)continue;ob.damaged=Math.max(0,(ob.damaged||0)-dt);const prev=ob.y;ob.y+=speed*dt*(ob.kind==='bomb'?.8:1);
       if(ob.kind!=='spark'&&!ob.warned&&ob.y>py*.66){
