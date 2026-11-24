@@ -1,8 +1,5 @@
 name: iOS TestFlight upload
 on:
-  push:
-    branches: [ios-preparation]
-    paths: ['.github/workflows/ios-upload.yml']
   workflow_dispatch:
 permissions:
   contents: read
