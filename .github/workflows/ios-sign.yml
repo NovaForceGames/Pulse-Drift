@@ -13,6 +13,7 @@ jobs:
   sign:
     if: github.ref == 'refs/heads/ios-preparation'
     runs-on: macos-26-intel
+    environment: ios-distribution
     timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
