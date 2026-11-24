@@ -1,0 +1,57 @@
+name: iOS Apple API read-only check
+on:
+  push:
+    branches: [ios-preparation]
+    paths: ['.github/workflows/ios-api-check.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  api-check:
+    if: github.ref == 'refs/heads/ios-preparation'
+    runs-on: macos-26-intel
+    timeout-minutes: 5
+    steps:
+      - name: Verify Apple API access without uploading or changing resources
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_PRIVATE_KEY: ${{ secrets.ASC_PRIVATE_KEY }}
+        run: |
+          python3 - <<'PY'
+          import os, json, base64, time, tempfile, subprocess, urllib.request, urllib.error
+          def enc(b):
+              return base64.urlsafe_b64encode(b).rstrip(b'=').decode()
+          try:
+              kid, issuer, key = (os.environ[n].strip() for n in ('ASC_KEY_ID','ASC_ISSUER_ID','ASC_PRIVATE_KEY'))
+              if not all((kid, issuer, key)):
+                  raise ValueError()
+              now = int(time.time())
+              msg = enc(json.dumps({'alg':'ES256','kid':kid,'typ':'JWT'}).encode()) + '.' + enc(json.dumps({'iss':issuer,'iat':now,'exp':now+300,'aud':'appstoreconnect-v1'}).encode())
+              with tempfile.TemporaryDirectory() as d:
+                  p = d + '/key.p8'
+                  with open(p,'w') as f:
+                      f.write(key)
+                  os.chmod(p,0o600)
+                  der = subprocess.run(['openssl','dgst','-sha256','-sign',p],input=msg.encode(),capture_output=True,check=True).stdout
+              assert der[0] == 48 and der[2] == 2
+              n = der[3]
+              r = int.from_bytes(der[4:4+n],'big')
+              i = 4+n
+              assert der[i] == 2
+              s = int.from_bytes(der[i+2:i+2+der[i+1]],'big')
+              token = msg + '.' + enc(r.to_bytes(32,'big')+s.to_bytes(32,'big'))
+              req = urllib.request.Request('https://api.appstoreconnect.apple.com/v1/apps?filter%5BbundleId%5D=games.novaforce.pulsedrift',headers={'Authorization':'Bearer '+token})
+              with urllib.request.urlopen(req,timeout=30) as response:
+                  data = json.load(response)
+              if not any(a.get('attributes',{}).get('bundleId') == 'games.novaforce.pulsedrift' for a in data.get('data',[])):
+                  print('API authenticated but target app not found.')
+                  raise SystemExit(1)
+              print('Apple API authenticated and target app verified. No resources changed.')
+          except urllib.error.HTTPError as e:
+              print('Apple API HTTP status:', e.code)
+              raise SystemExit(1)
+          except Exception:
+              print('API credential format, signing or network check failed. No secret values printed.')
+              raise SystemExit(1)
+          PY
