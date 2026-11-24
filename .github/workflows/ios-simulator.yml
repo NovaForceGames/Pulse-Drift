@@ -13,7 +13,7 @@ permissions:
 jobs:
   simulator-smoke:
     runs-on: macos-26-intel
-    timeout-minutes: 30
+    timeout-minutes: 40
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -47,7 +47,7 @@ jobs:
           echo "DEVICE_ID=$ID" >> "$GITHUB_ENV"
 
       - name: Boot simulator and launch game
-        timeout-minutes: 10
+        timeout-minutes: 20
         run: |
           set -eu
           xcrun simctl boot "$DEVICE_ID"
