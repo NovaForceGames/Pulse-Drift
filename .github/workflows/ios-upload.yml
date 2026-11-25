@@ -18,7 +18,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ios-signed-ipa
-          run-id: 45510563949
+          run-id: 45524100245
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path: ${{ runner.temp }}/ipa
       - name: Upload IPA to App Store Connect (TestFlight)
