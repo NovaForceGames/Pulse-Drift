@@ -78,8 +78,6 @@
     .buttons{display:grid;gap:10px}
     .continue-button{background:linear-gradient(115deg,#38ffca,#b0ffdd);color:#071b24;border:0;border-radius:14px;padding:13px 9px;min-height:55px;font-size:13px;letter-spacing:.04em;font-weight:1000;box-shadow:0 0 18px #33ffaf42}
     .continue-button[hidden]{display:none!important}
-    .continue-note{color:#b9c9e7;font-size:10px;line-height:1.45;margin:-4px 0 2px}
-    .continue-note[hidden]{display:none!important}
     .privacy-links{font-size:11px;color:#a8b9d9;margin-top:9px}
     .privacy-links a{color:#9ffdf1;text-decoration:underline;text-underline-offset:3px}
     .toast{z-index:4;position:absolute;left:50%;top:30%;transform:translateX(-50%) translateY(8px);pointer-events:none;opacity:0;transition:opacity .17s,transform .17s;text-shadow:0 0 22px #5dfcf1a0;font-size:17px;white-space:nowrap;font-weight:1000;letter-spacing:.09em;color:var(--aqua)}
@@ -121,7 +119,7 @@
     <div class="panel"><div class="kicker novaforce-kicker"><span class="novaforce-wordmark" aria-label="NovaForce Games"><span class="nf-symbol">✦</span> <span class="nf-name"><span class="nf-caps">N</span>ova<span class="nf-caps">F</span>orce <span class="nf-caps">G</span>ames</span></span><span class="novaforce-subline">PRESENTS · WARZONE V12</span></div><div class="mini-visual" aria-hidden="true"><div class="lane"></div><div class="lane"></div><div class="lane"></div></div><h1>PULSE<span>DRIFT</span></h1><p class="lead">AUTO FIRE won't stop shielded drones or mines! Survive dense missile waves, dodge armored bombs that take 8–9 hits, and earn bonus lives.</p><div class="chips"><span class="chip">♥ 5 LIVES</span><span class="chip">🔫 AUTO FIRE</span><span class="chip">🛡 DODGE DRONES & MINES</span><span class="chip">↔ SWIPE TO AIM</span><span class="chip">✦ GRAB ENERGY</span><span class="chip">⚡ PHASE TO SURVIVE</span></div><button id="start" class="primary">START RUN ↗</button><div class="muted">A NovaForce Games title · Free to play · No account needed</div><div class="privacy-links"><a href="privacy.html">Privacy / Gizlilik</a> <button id="privacy-choice" hidden type="button" style="color:#9ffdf1;font-size:11px;background:transparent;border:0;text-decoration:underline">Privacy choices</button></div></div>
   </section>
   <section id="pause-screen" class="overlay hidden" aria-label="Pause screen"><div class="panel"><div class="kicker">STAY IN CONTROL</div><h2>PAUSED</h2><p class="lead">Your run is safe. Continue whenever you are ready.</p><div class="buttons"><button id="resume" class="primary">RESUME RUN ↗</button><button id="quit" class="secondary">BACK TO MENU</button></div></div></section>
-  <section id="end-screen" class="overlay hidden" aria-label="Game over screen"><div class="panel"><div class="end-studio">✦ <strong>N</strong>ova<strong>F</strong>orce <strong>G</strong>ames</div><div class="kicker" id="end-kicker">SIGNAL LOST</div><h2>RUN COMPLETE</h2><p class="lead" id="end-message">Every run makes you faster. Go for a new best!</p><div class="result"><div class="cell"><small>YOUR SCORE</small><strong id="final-score">0</strong></div><div class="cell"><small>PERSONAL BEST</small><strong id="final-best">0</strong></div></div><div class="buttons"><button id="continue" class="continue-button" hidden>CONTINUE · +1 LIFE</button><div id="continue-note" class="continue-note" hidden>Web test: free continue, no advert shown.</div><button id="restart" class="primary">TRY AGAIN ↗</button><button id="share" class="secondary">SHARE THE GAME ↗</button></div></div></section>
+  <section id="end-screen" class="overlay hidden" aria-label="Game over screen"><div class="panel"><div class="end-studio">✦ <strong>N</strong>ova<strong>F</strong>orce <strong>G</strong>ames</div><div class="kicker" id="end-kicker">SIGNAL LOST</div><h2>RUN COMPLETE</h2><p class="lead" id="end-message">Every run makes you faster. Go for a new best!</p><div class="result"><div class="cell"><small>YOUR SCORE</small><strong id="final-score">0</strong></div><div class="cell"><small>PERSONAL BEST</small><strong id="final-best">0</strong></div></div><div class="buttons"><button id="continue" class="continue-button" hidden>CONTINUE · +1 LIFE</button><button id="restart" class="primary">TRY AGAIN ↗</button><button id="share" class="secondary">SHARE THE GAME ↗</button></div></div></section>
 </main>
 <script>
 (() => {
@@ -307,23 +305,23 @@
     }
   }
   function start(){reset();audioReady();setMode('playing');audioTone(205,.4,'sawtooth',.065,640);setTimeout(()=>{if(state.mode==='playing')audioTone(850,.19,'sine',.045,1100)},135)}
-  function end(){if(state.mode!=='playing')return;state.rumble=.5;state.flash=.6;burst(state.playerX,playerY(),'#f05dff',36,260);soundExplosion(1.0);haptic([40,35,80]);const score=Math.floor(state.score);let isBest=score>state.best;if(isBest){state.best=score;safeWrite(STORAGE_BEST,state.best)}$('final-score').textContent=fmt(score);$('final-best').textContent=fmt(state.best);$('end-kicker').textContent=isBest?'✦ NEW PERSONAL BEST':'SIGNAL LOST';$('end-message').textContent=isBest?'Incredible run. You set a new personal best!':'Every run makes you sharper. One more try?';updateHud();setMode('over');$('continue').hidden=state.continuesUsed>0;$('continue-note').hidden=state.continuesUsed>0;$('continue').disabled=false;$('continue').textContent=window.NovaForceAndroidAds?'WATCH REWARDED AD · +1 LIFE':'FREE TEST CONTINUE · +1 LIFE';$('continue-note').textContent=window.NovaForceAndroidAds?'Reward only after completing an ad. Uses Google test ads during development.':'Web test only: no advert is shown or revenue earned.'}
+  function end(){if(state.mode!=='playing')return;state.rumble=.5;state.flash=.6;burst(state.playerX,playerY(),'#f05dff',36,260);soundExplosion(1.0);haptic([40,35,80]);const score=Math.floor(state.score);let isBest=score>state.best;if(isBest){state.best=score;safeWrite(STORAGE_BEST,state.best)}$('final-score').textContent=fmt(score);$('final-best').textContent=fmt(state.best);$('end-kicker').textContent=isBest?'✦ NEW PERSONAL BEST':'SIGNAL LOST';$('end-message').textContent=isBest?'Incredible run. You set a new personal best!':'Every run makes you sharper. One more try?';updateHud();setMode('over');$('continue').hidden=state.continuesUsed>0;$('continue').disabled=false;$('continue').textContent='CONTINUE · +1 LIFE'}
   function applyRewardedContinue(){
     if(state.mode!=='over'||state.continuesUsed!==0||!state.rewardPending)return;
     state.rewardPending=false;state.continuesUsed=1;state.lives=1;state.hitShield=3;state.obstacles=[];state.shots=[];state.flash=.05;state.phaseTime=0;state.spawnTime=1.1;
     updateHud();setMode('playing');toast('+1 LIFE · SECOND CHANCE','#9fffe4');
   }
   // The Android bridge calls onReward ONLY after Google confirms a reward.
-  // Browsers intentionally use a clearly labelled free gameplay test.
+  // Local gameplay continues without an advert.
   window.NovaForceGame={
     onReward:()=>applyRewardedContinue(),
-    onAdUnavailable:()=>{state.rewardPending=false;if(state.mode==='over'){$('continue').disabled=false;$('continue').textContent='RETRY REWARDED AD · +1 LIFE';$('continue-note').textContent='No test ad available. You can still restart for free.';}}
+    onAdUnavailable:()=>{state.rewardPending=false;if(state.mode==='over'){$('continue').disabled=false;$('continue').textContent='CONTINUE · +1 LIFE';}}
   };
   function requestContinue(){
     if(state.mode!=='over'||state.continuesUsed!==0||state.rewardPending)return;
     state.rewardPending=true;
     if(window.NovaForceAndroidAds&&typeof window.NovaForceAndroidAds.showRewardedAd==='function'){
-      $('continue').disabled=true;$('continue').textContent='LOADING REWARDED AD…';
+      $('continue').disabled=true;
       try{window.NovaForceAndroidAds.showRewardedAd()}catch(e){window.NovaForceGame.onAdUnavailable();}
     }else{
       applyRewardedContinue();
