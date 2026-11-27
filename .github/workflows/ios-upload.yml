@@ -1,0 +1,44 @@
+name: iOS TestFlight upload
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: ios-upload
+  cancel-in-progress: false
+jobs:
+  upload:
+    if: github.ref == 'refs/heads/ios-preparation'
+    runs-on: macos-26-intel
+    environment: ios-distribution
+    timeout-minutes: 30
+    steps:
+      - name: Download signed IPA artifact from run 45510563949
+        uses: actions/download-artifact@v4
+        with:
+          name: ios-signed-ipa
+          run-id: 45524100245
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: ${{ runner.temp }}/ipa
+      - name: Upload IPA to App Store Connect (TestFlight)
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_PRIVATE_KEY: ${{ secrets.ASC_PRIVATE_KEY }}
+        run: |
+          set -euo pipefail
+          umask 077
+          test -n "$ASC_KEY_ID"
+          test -n "$ASC_ISSUER_ID"
+          test -n "$ASC_PRIVATE_KEY"
+          IPA_PATH="$(find "$RUNNER_TEMP/ipa" -maxdepth 2 -name '*.ipa' -print -quit)"
+          test -n "$IPA_PATH"
+          echo "Uploading: $IPA_PATH"
+          mkdir -p "$HOME/.appstoreconnect/private_keys"
+          printf '%s\n' "$ASC_PRIVATE_KEY" > "$HOME/.appstoreconnect/private_keys/AuthKey_${ASC_KEY_ID}.p8"
+          xcrun altool --upload-app --type ios --file "$IPA_PATH" \
+            --apiKey "$ASC_KEY_ID" --apiIssuer "$ASC_ISSUER_ID"
+      - name: Remove API key file
+        if: always()
+        run: rm -f "$HOME/.appstoreconnect/private_keys/AuthKey_${ASC_KEY_ID}.p8"
